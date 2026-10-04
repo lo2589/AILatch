@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AILatch — Promo Film</title>
+<style>
+:root{
+  --ink:#06080c; --ink2:#0c1118; --line:#1c2633;
+  --text:#e8eef7; --dim:#7d8aa0;
+  --lime:#b6ff5c; --cyan:#4de3ff; --amber:#ffb454; --red:#ff5d6c;
+  --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:"Inter","SF Pro Display","Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#000;overflow:hidden;font-family:var(--sans);color:var(--text)}
+#wrap{position:fixed;inset:0;display:grid;place-items:center}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:center;background:var(--ink);overflow:hidden;flex:none}
+/* backdrop */
+.grid{position:absolute;inset:-200px;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;opacity:.35;mask-image:radial-gradient(ellipse at center,#000 20%,transparent 70%)}
+.glow{position:absolute;width:1100px;height:1100px;border-radius:50%;filter:blur(140px);opacity:.28;transition:background .8s,transform 1.2s}
+#g1{left:-300px;top:-300px;background:var(--cyan)}
+#g2{right:-350px;bottom:-400px;background:var(--lime)}
+.scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 4px);pointer-events:none;mix-blend-mode:overlay}
+.vig{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.65));pointer-events:none}
+/* scenes */
+.scene{position:absolute;inset:0;opacity:0;pointer-events:none}
+.abs{position:absolute}
+.center{left:0;right:0;text-align:center}
+.big{white-space:nowrap;font-weight:800;letter-spacing:-.035em;line-height:1.04}
+.kicker{font-family:var(--mono);font-size:26px;letter-spacing:.32em;text-transform:uppercase;color:var(--dim)}
+.grad{background:linear-gradient(95deg,var(--lime),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+.red{color:var(--red)} .lime{color:var(--lime)} .cyan{color:var(--cyan)} .amber{color:var(--amber)} .dim{color:var(--dim)}
+.cn{font-size:44px;font-weight:600;color:var(--dim);letter-spacing:.06em}
+/* terminal */
+.term{background:linear-gradient(180deg,#0e1520,#0a0f17);border:1px solid #243247;border-radius:22px;box-shadow:0 60px 140px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.03) inset;overflow:hidden}
+.term .bar{height:56px;display:flex;align-items:center;gap:12px;padding:0 24px;border-bottom:1px solid #1a2433;font-family:var(--mono);font-size:20px;color:var(--dim)}
+.dot{width:16px;height:16px;border-radius:50%}
+.term pre{font-family:var(--mono);font-size:32px;line-height:1.55;padding:34px 40px;white-space:pre;color:#cfe0f5}
+.cur{display:inline-block;width:.6em;height:1.1em;background:var(--lime);vertical-align:-.18em;animation:bl 1s steps(2) infinite}
+@keyframes bl{50%{opacity:0}}
+.hex{color:#5b7a9c;word-break:break-all}
+.tag{position:absolute;font-family:var(--mono);font-size:24px;padding:10px 20px;border-radius:999px;border:1px solid;background:rgba(6,8,12,.85);white-space:nowrap}
+/* cards */
+.card{position:absolute;width:540px;height:300px;border-radius:26px;padding:38px;background:linear-gradient(160deg,#101826,#0a0f17);border:1px solid #243247;box-shadow:0 40px 90px rgba(0,0,0,.55)}
+.card h3{white-space:nowrap;font-size:40px;font-weight:800;letter-spacing:-.02em;margin:18px 0 12px}
+.card p{font-size:26px;line-height:1.4;color:var(--dim)}
+.card .ic{font-family:var(--mono);font-size:24px;color:var(--lime);letter-spacing:.2em}
+/* pipeline */
+.node{position:absolute;width:420px;height:230px;border-radius:26px;border:1.5px solid;padding:34px;background:rgba(10,15,23,.9)}
+.node b{display:block;font-size:46px;letter-spacing:-.02em;margin-bottom:10px}
+.node span{font-family:var(--mono);font-size:25px;color:var(--dim)}
+.arrow{position:absolute;height:4px;background:linear-gradient(90deg,var(--cyan),var(--lime));border-radius:4px;transform-origin:left}
+/* ui chrome */
+#hud{position:fixed;left:0;right:0;bottom:0;height:46px;display:flex;align-items:center;gap:14px;padding:0 18px;background:linear-gradient(transparent,rgba(0,0,0,.8));font:600 13px var(--mono);color:#9fb0c7;opacity:0;transition:opacity .3s;z-index:9}
+#wrap:hover #hud,body.paused #hud{opacity:1}
+#hud button{all:unset;cursor:pointer;padding:5px 12px;border:1px solid #2a3a50;border-radius:8px;color:#dfe9f7}
+#hud button:hover{border-color:var(--lime);color:var(--lime)}
+#bar{flex:1;height:6px;background:#1b2635;border-radius:6px;cursor:pointer;position:relative}
+#bar i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--lime),var(--cyan));border-radius:6px}
+#start{position:fixed;inset:0;z-index:10;display:grid;place-items:center;background:rgba(0,0,0,.55);cursor:pointer;backdrop-filter:blur(6px)}
+#start div{font:800 28px var(--sans);color:#fff;padding:22px 44px;border-radius:999px;background:linear-gradient(95deg,#4a8a14,#1a8ca8);box-shadow:0 0 80px rgba(77,227,255,.35)}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage">
+    <div class="grid" id="grid"></div>
+    <div class="glow" id="g1"></div><div class="glow" id="g2"></div>
+
+    <!-- S1 HOOK 0–6 -->
+    <section class="scene" id="s1">
+      <div class="abs kicker center" style="top:250px">THE PROBLEM · 问题</div>
+      <div class="abs big center" style="top:340px;font-size:150px"><span id="s1a"></span><span class="cur" id="s1c"></span></div>
+      <div class="abs big center red" id="s1b" style="top:560px;font-size:150px">Every. Single. File.</div>
+      <div class="abs cn center" id="s1c2" style="top:790px">你的 AI 助手，正在读取你的每一行代码。</div>
+    </section>
+
+    <!-- S2 EXPOSED 6–13 -->
+    <section class="scene" id="s2">
+      <div class="abs kicker" style="left:180px;top:120px">PLAINTEXT · 明文</div>
+      <div class="abs term" style="left:180px;top:190px;width:1560px;height:560px">
+        <div class="bar"><i class="dot" style="background:#ff5f56"></i><i class="dot" style="background:#ffbd2e"></i><i class="dot" style="background:#27c93f"></i>&nbsp; ~/project — ai-agent</div>
+<pre id="s2t"></pre>
+      </div>
+      <div class="tag" id="s2tag1" style="left:1260px;top:300px;color:var(--red);border-color:var(--red)">⚠ read_file() → full source</div>
+      <div class="tag" id="s2tag2" style="left:1180px;top:640px;color:var(--red);border-color:var(--red)">⚠ indexed · embedded · uploaded</div>
+      <div class="abs big center" id="s2q" style="top:810px;font-size:92px">Your secrets are <span class="red">one grep</span> away.</div>
+      <div class="abs cn center" id="s2cn" style="top:940px">你的机密，只差一次 grep。</div>
+    </section>
+
+    <!-- S3 LOCK 13–21 -->
+    <section class="scene" id="s3">
+      <div class="abs kicker" style="left:180px;top:120px">ONE COMMAND · 一条命令</div>
+      <div class="abs term" style="left:180px;top:190px;width:1560px;height:610px">
+        <div class="bar"><i class="dot" style="background:#ff5f56"></i><i class="dot" style="background:#ffbd2e"></i><i class="dot" style="background:#27c93f"></i>&nbsp; ~/project — terminal</div>
+<pre id="s3t"></pre>
+      </div>
+      <div class="abs big center" id="s3q" style="top:845px;font-size:100px"><span class="grad">Latch it.</span> The AI sees noise.</div>
+      <div class="abs cn center" id="s3cn" style="top:970px">一键上锁，AI 只看到乱码。</div>
+    </section>
+
+    <!-- S4 AI VIEW 21–29 -->
+    <section class="scene" id="s4">
+      <div class="abs kicker" style="left:180px;top:120px">THE AI'S VIEW · AI 的视角</div>
+      <div class="abs term" style="left:180px;top:190px;width:1560px;height:610px">
+        <div class="bar"><i class="dot" style="background:#ff5f56"></i><i class="dot" style="background:#ffbd2e"></i><i class="dot" style="background:#27c93f"></i>&nbsp; ~/project — ai-agent</div>
+<pre id="s4t"></pre>
+      </div>
+      <div class="abs big center" id="s4q" style="top:845px;font-size:100px">Zero matches. <span class="grad">Zero leaks.</span></div>
+      <div class="abs cn center" id="s4cn" style="top:970px">grep 零命中，机密零泄露。</div>
+    </section>
+
+    <!-- S5 RUN 29–38 -->
+    <section class="scene" id="s5">
+      <div class="abs kicker center" style="top:90px">MEMORY-ONLY EXECUTION · 仅在内存中解密</div>
+      <div class="node" id="n1" style="left:150px;top:230px;border-color:#3a4a63"><b class="dim">DISK</b><span>secret.py<br>9d 2a 71 03 ▒▒▒▒</span></div>
+      <div class="node" id="n2" style="left:750px;top:230px;border-color:var(--cyan)"><b class="cyan">MEMORY</b><span>decrypt · in-process<br>never written back</span></div>
+      <div class="node" id="n3" style="left:1350px;top:230px;border-color:var(--lime)"><b class="lime">RUN</b><span>exec / import / open()<br>works as normal</span></div>
+      <div class="arrow" id="a1" style="left:582px;top:343px;width:150px"></div>
+      <div class="arrow" id="a2" style="left:1182px;top:343px;width:150px"></div>
+      <div class="abs term" id="s5term" style="left:380px;top:540px;width:1160px;height:260px">
+<pre id="s5t" style="padding:26px 36px"></pre>
+      </div>
+      <div class="abs big center" id="s5q" style="top:850px;font-size:92px">Disk is ciphertext. <span class="grad">Memory is truth.</span></div>
+      <div class="abs cn center" id="s5cn" style="top:975px">磁盘是密文，内存才是真相。</div>
+    </section>
+
+    <!-- S6 FEATURES 38–45 -->
+    <section class="scene" id="s6">
+      <div class="abs kicker center" style="top:90px">BUILT LIKE A VAULT · 为安全而生</div>
+      <div class="card" id="c1" style="left:150px;top:200px"><div class="ic">01 / CIPHER</div><h3 class="lime">ChaCha20-Poly1305</h3><p>Authenticated encryption. Tamper → rejected.</p></div>
+      <div class="card" id="c2" style="left:690px;top:200px"><div class="ic">02 / KDF</div><h3 class="cyan">Argon2id</h3><p>Memory-hard keys. Brute force gets expensive.</p></div>
+      <div class="card" id="c3" style="left:1230px;top:200px"><div class="ic">03 / RUNTIME</div><h3 class="amber">Transparent I/O</h3><p>import, open(), Path.read_text() just work.</p></div>
+      <div class="card" id="c4" style="left:150px;top:530px"><div class="ic">04 / VIEWPORT</div><h3 class="lime">GUI Editor</h3><p>Edit plaintext. Saves back as ciphertext.</p></div>
+      <div class="card" id="c5" style="left:690px;top:530px"><div class="ic">05 / RECOVERY</div><h3 class="cyan">Never locked out</h3><p>Encrypted backups + optional recovery key.</p></div>
+      <div class="card" id="c6" style="left:1230px;top:530px"><div class="ic">06 / FREELOCK</div><h3 class="amber">JSON-RPC</h3><p>Controlled plaintext access for trusted tools.</p></div>
+      <div class="abs big center" id="s6q" style="top:880px;font-size:92px">Lock the code. <span class="grad">Keep the workflow.</span></div>
+    </section>
+
+    <!-- S7 OUTRO 45–52 -->
+    <section class="scene" id="s7">
+      <div class="abs center" id="logo" style="top:150px"><svg width="220" height="220" viewBox="0 0 120 120" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b6ff5c"/><stop offset="1" stop-color="#4de3ff"/></linearGradient></defs><path id="shackle" d="M38 54V38a22 22 0 0 1 44 0v16" stroke="url(#lg)" stroke-width="9" stroke-linecap="round"/><rect x="24" y="52" width="72" height="54" rx="14" fill="url(#lg)"/><circle cx="60" cy="76" r="7" fill="#06080c"/><rect x="57" y="78" width="6" height="14" rx="3" fill="#06080c"/></svg></div>
+      <div class="abs big center" id="s7a" style="top:400px;font-size:210px"><span class="grad">AILatch</span></div>
+      <div class="abs big center" id="s7b" style="top:640px;font-size:78px">Latch it. Run it. <span class="lime">Ship it.</span></div>
+      <div class="abs cn center" id="s7c" style="top:760px">把代码锁起来，让它照常运行。</div>
+      <div class="abs center" id="s7d" style="top:880px"><span style="font:600 38px var(--mono);padding:20px 40px;border:1px solid #2a3a50;border-radius:16px;background:#0b111a;color:var(--lime)">$ pip install ailatch</span> <span style="font:500 30px var(--mono);color:var(--dim);margin-left:30px">github.com/lo2589/AILATCH</span></div>
+    </section>
+
+    <div class="scan"></div><div class="vig"></div>
+  </div>
+</div>
+
+<div id="start"><div>▶ Play AILatch Film</div></div>
+<div id="hud"><button id="pp">⏸</button><button id="rs">⟲</button><div id="bar"><i></i></div><span id="tm">0:00</span><button id="fs">⛶</button></div>
+
+<script>
+(()=>{
+const DUR=52;
+const $=id=>document.getElementById(id);
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const ease=x=>1-Math.pow(1-clamp(x),3);
+const S={s1:[0,6],s2:[6,13],s3:[13,21],s4:[21,29],s5:[29,38],s6:[38,45],s7:[45,52]};
+
+// ---- stage scaling
+const stage=$('stage');
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`scale(${s})`}
+addEventListener('resize',fit);fit();
+
+// ---- helpers
+function fade(el,t,t0,t1,dy=24){const p=ease((t-t0)/0.6);const out=t1!=null?ease((t-t1)/0.5):0;
+  const o=clamp(p-out);el.style.opacity=o;el.style.transform=`translateY(${(1-p)*dy}px)`;}
+function typed(str,t,t0,cps=38){const n=Math.floor(clamp((t-t0)*cps,0,1e9));return str.slice(0,n)}
+function scene(el,t,[a,b]){
+  const o=clamp((t-a)/0.5)*(1-clamp((t-(b-0.5))/0.5));
+  el.style.opacity=(t>=a&&t<b)?o:0;
+  return t>=a&&t<b? t-a : -1;
+}
+// deterministic pseudo-random
+function rnd(i){const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)}
+const GL='0123456789abcdef▒░▓#@$%&';
+function scramble(src,p,seed){ // p:0 plain → 1 cipher
+  let out='';for(let i=0;i<src.length;i++){const c=src[i];if(c==='\n'||c===' '){out+=c;continue}
+    const th=rnd(i+seed);out+= p>th ? GL[Math.floor(rnd(i*3+seed+Math.floor(p*40))*GL.length)] : c}
+  return out}
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+const SRC=`import os
+API_KEY = "sk-live-9f3a77c1e2d8"      # production
+DB_URL  = "postgres://admin:hunter2@prod"
+
+def pricing_engine(order):
+    # our secret sauce
+    return order.total * 0.8731 + MARGIN`;
+
+// real ciphertext bytes captured from \`ailatch lock\` on this repo's own test run
+const HEX=`9d 2a 71 03 02 00 00 00 01 14 7b 22 6b 64 66 22
+3a 22 61 72 67 6f 6e 32 69 64 22 2c 22 61 65 61
+64 22 3a 22 63 68 61 63 68 61 32 30 70 6f 6c 79
+31 33 30 35 22 2c 22 73 61 6c 74 22 3a 22 63 64
+e1 07 5c b8 4a 90 f3 2e 6d 11 a7 c4 03 9b 58 d2
+7f 3a 8e 21 b6 c9 04 5d e8 12 af 70 39 cb 86 14`;
+
+// ---- render(t)
+function render(t){
+  t=clamp(t,0,DUR-0.001);
+  // ambient motion
+  $('g1').style.transform=`translate(${Math.sin(t*.3)*80}px,${t*6}px)`;
+  $('g2').style.transform=`translate(${-Math.cos(t*.25)*90}px,${-t*5}px)`;
+  $('grid').style.transform=`translateY(${(t*14)%80}px)`;
+  // glow color follows narrative: danger → safe
+  $('g1').style.background = (t>=6&&t<13)?'#ff5d6c':'#4de3ff';
+
+  // S1
+  let l=scene($('s1'),t,S.s1);
+  if(l>=0){
+    const A='Your AI reads';
+    const a=typed(A,l,0.3,22);$('s1a').textContent=a;
+    $('s1c').style.display=(a.length<A.length||l<2.2)?'inline-block':'none';
+    fade($('s1b'),l,2.4);fade($('s1c2'),l,3.4);
+    $('s1b').style.top=(560)+'px';
+  }
+  // S2
+  l=scene($('s2'),t,S.s2);
+  if(l>=0){
+    const cmd='$ cat pricing.py\n';
+    const full=cmd+SRC;
+    const txt=typed(full,l,0.4,60);
+    let h=esc(txt).replace(/(sk-live-[0-9a-f]+)/,'<span class="red">$1</span>').replace(/(hunter2)/,'<span class="red">$1</span>').replace(/(# .*)/g,'<span class="dim">$1</span>').replace(/^(\$ cat pricing\.py)/,'<span class="lime">$1</span>');
+    $('s2t').innerHTML=h;
+    fade($('s2tag1'),l,3.0);fade($('s2tag2'),l,3.6);
+    fade($('s2q'),l,4.2);fade($('s2cn'),l,5.0);
+  }
+  // S3
+  l=scene($('s3'),t,S.s3);
+  if(l>=0){
+    const c1=typed('$ ailatch lock pricing.py',l,0.3,30);
+    let o=c1;
+    if(l>1.2){o='$ ailatch lock pricing.py\n';
+      const p=clamp((l-1.6)/3.0);
+      const body=p<1? scramble(SRC,p,7): null;
+      if(p<1){o+='\n'+body}
+      else {o+='  <LOCK>  locked: pricing.py\n\n'+HEX.split('\n').slice(0,4).join('\n')+'\n…'}
+    }
+    let h=esc(o);
+    if(l>1.2){h=h.replace(/^(\$ ailatch lock pricing\.py)/,'<span class="lime">$1</span>').replace('&lt;LOCK&gt;','<span class="lime">✔</span>')}
+    else h='<span class="lime">'+h+'</span><span class="cur"></span>';
+    if(l>=4.6) h=h.replace(/\n([0-9a-f]{2} .*)/s,(m)=>'\n<span class="hex">'+m.slice(1)+'</span>');
+    $('s3t').innerHTML=h;
+    fade($('s3q'),l,5.2);fade($('s3cn'),l,6.0);
+  }
+  // S4
+  l=scene($('s4'),t,S.s4);
+  if(l>=0){
+    let o='';
+    const c1='$ grep -rn "sk-live" .\n';
+    const c2='$ cat pricing.py | head -c 64\n';
+    o+=typed(c1,l,0.3,34);
+    let h=esc(o);
+    if(l>2.0){h='<span class="lime">$ grep -rn "sk-live" .</span>\n<span class="amber">0 matches</span>\n\n'}
+    if(l>3.2){h+='<span class="lime">'+esc(typed(c2,l,3.2,34))+'</span>';}
+    if(l>4.8){h='<span class="lime">$ grep -rn "sk-live" .</span>\n<span class="amber">0 matches</span>\n\n<span class="lime">$ cat pricing.py | head -c 64</span>\n<span class="hex">'+HEX.split('\n').slice(0,4).join('\n')+'</span>\n'+'<span class="dim">binary ciphertext — nothing to index, nothing to learn.</span>'}
+    $('s4t').innerHTML=h;
+    fade($('s4q'),l,5.6);fade($('s4cn'),l,6.4);
+  }
+  // S5
+  l=scene($('s5'),t,S.s5);
+  if(l>=0){
+    fade($('n1'),l,0.2);fade($('n2'),l,1.0);fade($('n3'),l,1.8);
+    const g=(el,t0)=>{el.style.opacity=ease((l-t0)/0.5);el.style.transform=`scaleX(${ease((l-t0)/0.7)})`};
+    g($('a1'),0.8);g($('a2'),1.6);
+    fade($('s5term'),l,2.6);
+    let h='<span class="lime">$ ailatch run app.py</span>\n';
+    if(l>3.6)h+='RESULT: <span class="lime">SECRET-ALGO-7</span>\n';
+    if(l>4.4)h+='<span class="dim">$ cat helper.py | grep SECRET   # on disk</span>\n<span class="amber">(no output — still ciphertext)</span>';
+    $('s5t').innerHTML=l>2.9?h:'<span class="lime">$ ailatch run app.py</span><span class="cur"></span>';
+    fade($('s5q'),l,5.6);fade($('s5cn'),l,6.6);
+  }
+  // S6
+  l=scene($('s6'),t,S.s6);
+  if(l>=0){['c1','c2','c3','c4','c5','c6'].forEach((id,i)=>fade($(id),l,0.2+i*0.35,null,40));
+    fade($('s6q'),l,3.2);}
+  // S7
+  l=scene($('s7'),t,S.s7);
+  if(l>=0){
+    fade($('logo'),l,0.1,null,-30);
+    $('shackle').style.transform=`translateY(${(1-ease((l-0.4)/0.8))*-14}px)`;
+    fade($('s7a'),l,0.5);fade($('s7b'),l,1.5);fade($('s7c'),l,2.3);fade($('s7d'),l,3.2);
+  }
+  $('bar').firstElementChild.style.width=(t/DUR*100)+'%';
+  const m=Math.floor(t/60),s=Math.floor(t%60);$('tm').textContent=m+':'+String(s).padStart(2,'0')+' / 0:52';
+}
+
+// ---- clock
+let t=0,playing=false,last=0;
+function loop(ts){
+  if(playing){t+=(ts-last)/1000;if(t>=DUR){t=0}}
+  last=ts;render(t);requestAnimationFrame(loop)}
+function setPlay(p){playing=p;$('pp').textContent=p?'⏸':'▶';document.body.classList.toggle('paused',!p)}
+$('start').onclick=()=>{$('start').style.display='none';setPlay(true)};
+$('pp').onclick=()=>setPlay(!playing);
+$('rs').onclick=()=>{t=0};
+$('fs').onclick=()=>{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()};
+$('bar').onclick=e=>{const r=$('bar').getBoundingClientRect();t=(e.clientX-r.left)/r.width*DUR};
+addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();$('start').style.display='none';setPlay(!playing)}
+  if(e.code==='ArrowRight')t=Math.min(DUR-.1,t+2);
+  if(e.code==='ArrowLeft')t=Math.max(0,t-2);
+  if(e.key==='f')$('fs').click();
+});
+// hooks for automated capture
+window.__seek=x=>{t=x;render(t)};
+const q=new URLSearchParams(location.search);
+if(q.has('t')){t=+q.get('t');$('start').style.display='none';setPlay(false)}
+else if(q.has('autoplay')){$('start').style.display='none';setPlay(true)}
+requestAnimationFrame(ts=>{last=ts;loop(ts)});
+})();
+</script>
+</body>
+</html>
