@@ -65,16 +65,17 @@ canvas{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:
 
   <!-- S1 HOOK -->
   <section class="scene" id="s1">
-    <div class="abs kicker center" style="top:230px">THE PROBLEM · 问题</div>
-    <div class="abs big center" id="s1a" style="top:320px;font-size:104px">Your AI agent doesn't read a file.</div>
-    <div class="abs big center gradr" id="s1b" style="top:470px;font-size:140px">It reads the whole repo.</div>
-    <div class="abs cn center" id="s1c" style="top:760px">人看一行，AI 读整个仓库。</div>
+    <div class="abs" style="inset:0;background:radial-gradient(ellipse at center,rgba(5,7,11,.55),rgba(5,7,11,.92))"></div>
+    <div class="abs big center" id="h1" style="top:150px;font-size:230px">YOUR AI</div>
+    <div class="abs big center" id="h2" style="top:400px;font-size:230px">JUST READ</div>
+    <div class="abs big center red" id="h3" style="top:610px;font-size:290px;text-shadow:0 0 60px rgba(255,61,85,.6)">.env</div>
+    <div class="abs cn center" id="h4" style="top:930px;font-size:58px;color:#e8eef7">你的 AI 刚读完了你的密钥 —— <span class="red">而你毫无察觉。</span></div>
   </section>
 
   <!-- S2 FLOOD (canvas) -->
   <section class="scene" id="s2">
     <div class="abs kicker" style="left:60px;top:42px">AGENT SESSION · LIVE · 信息洪流</div>
-    <div class="abs big center" id="s2q" style="top:880px;font-size:96px">You can't review what you <span class="gradr">can't keep up with.</span></div>
+    <div class="abs big center" id="s2q" style="top:885px;font-size:84px">You can't review what you <span class="gradr">can't keep up with.</span></div>
     <div class="abs cn center" id="s2cn" style="top:995px">你盯不过来，机密就在无意间溜走。</div>
   </section>
 
@@ -100,7 +101,7 @@ canvas{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:
   <!-- S5 SAFE FLOOD (canvas) -->
   <section class="scene" id="s5">
     <div class="abs kicker" style="left:60px;top:42px">AGENT SESSION · LIVE · AILATCH ON</div>
-    <div class="abs big center" id="s5q" style="top:880px;font-size:96px">Same agent. Same speed. <span class="grad">Nothing to take.</span></div>
+    <div class="abs big center" id="s5q" style="top:885px;font-size:84px">Same agent. Same speed. <span class="grad">Nothing to take.</span></div>
     <div class="abs cn center" id="s5cn" style="top:995px">同样的 AI，同样的速度，什么也带不走。</div>
   </section>
 
@@ -136,8 +137,10 @@ canvas{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:
     <div class="abs big center" id="s8b" style="top:630px;font-size:78px">Latch it. Run it. <span class="lime">Ship it.</span></div>
     <div class="abs cn center" id="s8c" style="top:750px">把代码锁起来，让它照常运行。</div>
     <div class="abs center" id="s8d" style="top:870px"><span style="font:600 38px var(--mono);padding:20px 40px;border:1px solid #2a3a50;border-radius:16px;background:#0b111a;color:var(--lime)">$ pip install ailatch</span> <span style="font:500 30px var(--mono);color:var(--dim);margin-left:30px">github.com/lo2589/AILATCH</span></div>
+    <div class="abs center" id="s8e" style="top:985px;font:600 30px var(--mono);letter-spacing:.3em;color:var(--dim)">BUILT BY <span class="lime">@lo2589</span></div>
   </section>
 
+  <div id="brand" class="abs" style="right:56px;top:34px;z-index:7;display:flex;align-items:center;gap:14px;opacity:.95"><svg width="46" height="46" viewBox="0 0 120 120" fill="none"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b6ff5c"/><stop offset="1" stop-color="#4de3ff"/></linearGradient></defs><path d="M38 54V38a22 22 0 0 1 44 0v16" stroke="url(#lg2)" stroke-width="10" stroke-linecap="round"/><rect x="24" y="52" width="72" height="54" rx="14" fill="url(#lg2)"/><circle cx="60" cy="76" r="7" fill="#05070b"/><rect x="57" y="78" width="6" height="14" rx="3" fill="#05070b"/></svg><div style="line-height:1.1"><div style="font:800 26px var(--sans);letter-spacing:-.02em">AILatch</div><div style="font:600 18px var(--mono);color:var(--lime)">@lo2589</div></div></div>
   <div id="flash"></div><div class="scan"></div><div class="vig"></div>
 </div></div>
 <div id="start"><div>▶ Play AILatch Film</div></div>
@@ -146,11 +149,11 @@ canvas{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:
 <script>
 const LOCK={"size": 645, "plain": 195, "hdrLen": 276, "ctStart": 286, "head": [{"off": "00000000", "hex": "9d 2a 71 03 02 00 00 00 01 14 7b 22 6b 64 66 22", "asc": ".*q.......{\"kdf\""}, {"off": "00000010", "hex": "3a 22 61 72 67 6f 6e 32 69 64 22 2c 22 61 65 61", "asc": ":\"argon2id\",\"aea"}, {"off": "00000020", "hex": "64 22 3a 22 63 68 61 63 68 61 32 30 70 6f 6c 79", "asc": "d\":\"chacha20poly"}, {"off": "00000030", "hex": "31 33 30 35 22 2c 22 73 61 6c 74 22 3a 22 49 37", "asc": "1305\",\"salt\":\"I7"}], "ct": [{"off": "00000120", "hex": "a9 93 01 6b 27 e1 ed 54 44 c3 95 30 9f 3f 9c db", "asc": "...k'..TD..0.?.."}, {"off": "00000130", "hex": "45 da f6 e1 71 76 54 e1 3a 01 ea c3 73 f0 89 90", "asc": "E...qvT.:...s..."}, {"off": "00000140", "hex": "56 79 3d c0 1d 47 32 fa 37 11 c0 5e 71 fc 1e a8", "asc": "Vy=..G2.7..^q..."}, {"off": "00000150", "hex": "b9 34 01 0f 2b 8b ae 6a 36 df 3c 4e 9a 09 3d b9", "asc": ".4..+..j6.<N..=."}, {"off": "00000160", "hex": "cb 6e 9a 4a a2 13 0f 1c 15 74 cd ca 42 d8 d1 40", "asc": ".n.J.....t..B..@"}, {"off": "00000170", "hex": "31 00 94 f2 15 bb fa 23 31 a8 52 c7 c1 39 99 10", "asc": "1......#1.R..9.."}], "ctLen": 359, "catHead": "�*q�������{\"kdf\":\"argon2id\",\"aead\":\"chacha20poly1305\",\"salt\":\"I7RNEG52N9JV7SOI/Y+zRA==\",\"nonce\":\"ROZWzLKeIqjZgyEZ\",\"created\":1791138604,\"hint\":null,\"k", "catCt": "�-���k'��TDÕ0�?��E���qvT�:���s���Vy=��G2�7��^q����4��+��j6�<N��=��n�J�����t��B��@1������#1�R��9���,+��Ы]�B_�G-�W����3'K\n���ʹ<V�V���@٦�]�y2y���@���������$ŹY\\����(�q������]D�,�v� ��i�c��̐s�#��2E�Dl&݃X}�M��V\"Q�բ��2�/�R:@�Ƅ���U����H#\"q���X�l$:���V[5Ҩ�׵AQ*�Q!H2��Cr�i-�����rS�+%�[;}�4����"};
 (()=>{
-const DUR=61;
+const DUR=56;
 const $=id=>document.getElementById(id);
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
 const ease=x=>1-Math.pow(1-clamp(x),3);
-const S={s1:[0,5],s2:[5,15],s3:[15,21],s4:[21,33],s5:[33,43],s6:[43,50],s7:[50,56],s8:[56,61]};
+const S={s1:[0,4.2],s2:[4.2,13.2],s3:[13.2,18.2],s4:[18.2,30.2],s5:[30.2,38.2],s6:[38.2,44.2],s7:[44.2,49.2],s8:[49.2,56]};
 const stage=$('stage');
 function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`scale(${s})`}
 addEventListener('resize',fit);fit();
@@ -290,32 +293,42 @@ function drawFlood(l,safe,dur){
 // ================= render =================
 function render(t){
   t=clamp(t,0,DUR-0.001);
-  const danger=(t>=5&&t<21)||(t<5&&t>2.6);
-  const col=(t>=33&&t<50)||(t>=50)?'#4de3ff':(danger?'#ff3d55':'#4de3ff');
-  $('g1').style.background=col;$('g2').style.background=(t>=5&&t<21)?'#ff3d55':'#b6ff5c';
+  const danger=(t<18.2);
+  const col=danger?'#ff3d55':'#4de3ff';
+  $('g1').style.background=col;$('g2').style.background=danger?'#ff3d55':'#b6ff5c';
   $('g1').style.transform=`translate(${Math.sin(t*.3)*80}px,${t*5}px)`;
   $('g2').style.transform=`translate(${-Math.cos(t*.25)*90}px,${-t*4}px)`;
   $('grid').style.transform=`translateY(${(t*14)%80}px)`;
 
-  let l=scene($('s1'),t,S.s1);
-  if(l>=0){fade($('s1a'),l,0.3);fade($('s1b'),l,1.5);fade($('s1c'),l,2.8);
-    // glitch on s1b
-    const gl=l>1.5&&l<1.9?(rnd(Math.floor(l*40))-0.5)*24:0;$('s1b').style.transform+=` translateX(${gl}px)`}
-
-  l=scene($('s2'),t,S.s2);
   cx.clearRect(0,0,1920,1080);
-  if(l>=0){drawFlood(l,false);fade($('s2q'),l,6.2);fade($('s2cn'),l,7.2)}
+  let l=t<4.2?t:-1;
+  $('s1').style.opacity=l>=0?(1-clamp((t-3.8)/0.4)):0;
+  if(l>=0){
+    drawFlood(l+3.2,false);
+    const slam=(id,t0)=>{const el=$(id);const p=clamp((l-t0)/0.14);const on=l>=t0;
+      el.style.opacity=on?1:0;const sc=1+(1-ease(p))*0.45;
+      const sh=on&&l-t0<0.35?(rnd(Math.floor(l*60)+t0*9)-0.5)*26*(1-(l-t0)/0.35):0;
+      el.style.transform=`scale(${sc}) translateX(${sh}px)`};
+    slam('h1',0);slam('h2',0.8);slam('h3',1.6);
+    const k=l>=2.7?ease((l-2.7)/0.4):0;$('h4').style.opacity=k;$('h4').style.transform=`translateY(${(1-k)*20}px)`;
+    let f=0;[0,0.8,1.6].forEach(h=>{if(l>=h&&l-h<0.22)f=Math.max(f,0.4*(1-(l-h)/0.22))});
+    $('flash').style.opacity=f;
+    $('h3').style.filter=(l>1.6&&l<2.1&&Math.floor(l*30)%2)?'hue-rotate(60deg) contrast(1.4)':'none';
+  }
+  l=scene($('s2'),t,S.s2);
+  if(t>=4.2)cx.clearRect(0,0,1920,1080);
+  if(l>=0){drawFlood(l,false);fade($('s2q'),l,5.4);fade($('s2cn'),l,6.4)}
   l=scene($('s5'),t,S.s5);
-  if(l>=0){drawFlood(l,true);fade($('s5q'),l,6.0);fade($('s5cn'),l,7.0)}
+  if(l>=0){drawFlood(l,true);fade($('s5q'),l,5.0);fade($('s5cn'),l,5.9)}
 
   l=scene($('s3'),t,S.s3);
   if(l>=0){
     const rows=[['.env','DATABASE_PASSWORD'],['config/secrets.yaml','STRIPE_SECRET'],['~/.ssh/id_rsa','private key'],['src/pricing.py','pricing algorithm'],['billing/keys.py','sk-live-9f3a…'],['infra/deploy.sh','AWS_SECRET_ACCESS_KEY']];
     let h='';
-    rows.forEach((r,i)=>{if(l>0.5+i*0.55){h+=`<span class="dim">14:02:${String(7+i).padStart(2,'0')}</span>  <span class="cyan">read</span>  ${esc(r[0].padEnd(24))}<span class="red">⚠ ${esc(r[1])}</span>\n`}});
-    if(l>4.0)h+=`\n<span class="amber">human alerts raised:</span>  <span class="red">0</span>\n<span class="amber">secrets now in model context:</span>  <span class="red">${rows.length}</span>`;
+    rows.forEach((r,i)=>{if(l>0.4+i*0.45){h+=`<span class="dim">14:02:${String(7+i).padStart(2,'0')}</span>  <span class="cyan">read</span>  ${esc(r[0].padEnd(24))}<span class="red">⚠ ${esc(r[1])}</span>\n`}});
+    if(l>3.0)h+=`\n<span class="amber">human alerts raised:</span>  <span class="red">0</span>\n<span class="amber">secrets now in model context:</span>  <span class="red">${rows.length}</span>`;
     $('s3t').innerHTML=h;
-    fade($('s3q'),l,3.6);fade($('s3cn'),l,4.4);
+    fade($('s3q'),l,3.3);fade($('s3cn'),l,4.0);
   }
 
   l=scene($('s4'),t,S.s4);
@@ -355,31 +368,31 @@ function render(t){
     $('pL').style.borderColor=locked?'#4de3ff':'#243247';
     // flash on lock moment
     const fl=clamp(1-Math.abs(l-2.7)/0.25)*0.5;$('flash').style.opacity=fl;
-    fade($('s4t1'),l,7.6);fade($('s4t2'),l,9.0);
-    fade($('s4q'),l,9.4);fade($('s4cn'),l,10.2);
-    $('s4t1').style.opacity=l>7.6?Math.min(ease((l-7.6)/0.5),1):0;
+    fade($('s4t1'),l,8.4);fade($('s4t2'),l,9.0);
+    fade($('s4q'),l,9.6);fade($('s4cn'),l,10.4);
+    
     // header/ciphertext tags only after hexdump begins
-  }else $('flash').style.opacity=0;
+  }
 
   l=scene($('s6'),t,S.s6);
   if(l>=0){
-    fade($('n1'),l,0.2);fade($('n2'),l,1.0);fade($('n3'),l,1.8);
+    fade($('n1'),l,0.2);fade($('n2'),l,0.8);fade($('n3'),l,1.4);
     const g=(el,t0)=>{el.style.opacity=ease((l-t0)/0.5);el.style.transform=`scaleX(${ease((l-t0)/0.7)})`};
-    g($('a1'),0.8);g($('a2'),1.6);fade($('s6term'),l,2.4);
+    g($('a1'),0.6);g($('a2'),1.2);fade($('s6term'),l,1.9);
     let h='<span class="lime">$ ailatch run app.py</span>\n';
-    if(l>3.3)h+='RESULT: <span class="lime">SECRET-ALGO-7</span>\n';
-    if(l>4.0)h+='<span class="dim">$ grep SECRET pricing.py   # on disk</span>\n<span class="amber">(no output — still ciphertext)</span>';
-    $('s6t').innerHTML=l>2.7?h:'<span class="lime">$ ailatch run app.py</span><span class="cur"></span>';
-    fade($('s6q'),l,4.6);fade($('s6cn'),l,5.4);
+    if(l>2.9)h+='RESULT: <span class="lime">SECRET-ALGO-7</span>\n';
+    if(l>3.4)h+='<span class="dim">$ grep SECRET pricing.py   # on disk</span>\n<span class="amber">(no output — still ciphertext)</span>';
+    $('s6t').innerHTML=l>2.4?h:'<span class="lime">$ ailatch run app.py</span><span class="cur"></span>';
+    fade($('s6q'),l,3.9);fade($('s6cn'),l,4.7);
   }
   l=scene($('s7'),t,S.s7);
-  if(l>=0){['c1','c2','c3','c4','c5','c6'].forEach((id,i)=>fade($(id),l,0.2+i*0.3,40));fade($('s7q'),l,2.8)}
+  if(l>=0){['c1','c2','c3','c4','c5','c6'].forEach((id,i)=>fade($(id),l,0.15+i*0.22,40));fade($('s7q'),l,1.8)}
   l=scene($('s8'),t,S.s8);
   if(l>=0){fade($('logo'),l,0.1,-30);$('shackle').style.transform=`translateY(${(1-ease((l-0.4)/0.8))*-14}px)`;
-    fade($('s8a'),l,0.5);fade($('s8b'),l,1.5);fade($('s8c'),l,2.3);fade($('s8d'),l,3.2)}
-  if(!(t>=21&&t<33))$('flash').style.opacity=0;
+    fade($('s8a'),l,0.5);fade($('s8b'),l,1.5);fade($('s8c'),l,2.3);fade($('s8d'),l,3.2);fade($('s8e'),l,4.0)}
+  if(!(t>=18.2&&t<30.2)&&t>=4.2)$('flash').style.opacity=0;
   $('bar').firstElementChild.style.width=(t/DUR*100)+'%';
-  $('tm').textContent='0:'+String(Math.floor(t)).padStart(2,'0')+' / 1:01';
+  $('tm').textContent='0:'+String(Math.floor(t)).padStart(2,'0')+' / 0:56';
 }
 let t=0,playing=false,last=0;
 function loop(ts){if(playing){t+=(ts-last)/1000;if(t>=DUR)t=0}last=ts;render(t);requestAnimationFrame(loop)}
