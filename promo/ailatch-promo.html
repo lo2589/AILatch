@@ -6,309 +6,390 @@
 <title>AILatch — Promo Film</title>
 <style>
 :root{
-  --ink:#06080c; --ink2:#0c1118; --line:#1c2633;
+  --ink:#05070b; --line:#182130;
   --text:#e8eef7; --dim:#7d8aa0;
-  --lime:#b6ff5c; --cyan:#4de3ff; --amber:#ffb454; --red:#ff5d6c;
-  --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --lime:#b6ff5c; --cyan:#4de3ff; --amber:#ffb454; --red:#ff3d55;
+  --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,"Liberation Mono","DejaVu Sans Mono",monospace;
   --sans:"Inter","SF Pro Display","Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:#000;overflow:hidden;font-family:var(--sans);color:var(--text)}
 #wrap{position:fixed;inset:0;display:grid;place-items:center}
 #stage{position:relative;width:1920px;height:1080px;transform-origin:center;background:var(--ink);overflow:hidden;flex:none}
-/* backdrop */
-.grid{position:absolute;inset:-200px;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;opacity:.35;mask-image:radial-gradient(ellipse at center,#000 20%,transparent 70%)}
-.glow{position:absolute;width:1100px;height:1100px;border-radius:50%;filter:blur(140px);opacity:.28;transition:background .8s,transform 1.2s}
-#g1{left:-300px;top:-300px;background:var(--cyan)}
-#g2{right:-350px;bottom:-400px;background:var(--lime)}
-.scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 4px);pointer-events:none;mix-blend-mode:overlay}
-.vig{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.65));pointer-events:none}
-/* scenes */
+.grid{position:absolute;inset:-200px;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;opacity:.3;mask-image:radial-gradient(ellipse at center,#000 20%,transparent 70%)}
+.glow{position:absolute;width:1100px;height:1100px;border-radius:50%;filter:blur(150px);opacity:.3}
+#g1{left:-300px;top:-300px}#g2{right:-350px;bottom:-400px}
+.scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 1px,transparent 1px 4px);pointer-events:none;mix-blend-mode:overlay;z-index:5}
+.vig{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.7));pointer-events:none;z-index:5}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;z-index:6;pointer-events:none}
+canvas{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none}
 .scene{position:absolute;inset:0;opacity:0;pointer-events:none}
 .abs{position:absolute}
 .center{left:0;right:0;text-align:center}
 .big{white-space:nowrap;font-weight:800;letter-spacing:-.035em;line-height:1.04}
 .kicker{font-family:var(--mono);font-size:26px;letter-spacing:.32em;text-transform:uppercase;color:var(--dim)}
 .grad{background:linear-gradient(95deg,var(--lime),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
-.red{color:var(--red)} .lime{color:var(--lime)} .cyan{color:var(--cyan)} .amber{color:var(--amber)} .dim{color:var(--dim)}
-.cn{font-size:44px;font-weight:600;color:var(--dim);letter-spacing:.06em}
-/* terminal */
-.term{background:linear-gradient(180deg,#0e1520,#0a0f17);border:1px solid #243247;border-radius:22px;box-shadow:0 60px 140px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.03) inset;overflow:hidden}
-.term .bar{height:56px;display:flex;align-items:center;gap:12px;padding:0 24px;border-bottom:1px solid #1a2433;font-family:var(--mono);font-size:20px;color:var(--dim)}
-.dot{width:16px;height:16px;border-radius:50%}
-.term pre{font-family:var(--mono);font-size:32px;line-height:1.55;padding:34px 40px;white-space:pre;color:#cfe0f5}
-.cur{display:inline-block;width:.6em;height:1.1em;background:var(--lime);vertical-align:-.18em;animation:bl 1s steps(2) infinite}
-@keyframes bl{50%{opacity:0}}
-.hex{color:#5b7a9c;word-break:break-all}
-.tag{position:absolute;font-family:var(--mono);font-size:24px;padding:10px 20px;border-radius:999px;border:1px solid;background:rgba(6,8,12,.85);white-space:nowrap}
-/* cards */
-.card{position:absolute;width:540px;height:300px;border-radius:26px;padding:38px;background:linear-gradient(160deg,#101826,#0a0f17);border:1px solid #243247;box-shadow:0 40px 90px rgba(0,0,0,.55)}
+.gradr{background:linear-gradient(95deg,#ff8a5c,var(--red));-webkit-background-clip:text;background-clip:text;color:transparent}
+.red{color:var(--red)}.lime{color:var(--lime)}.cyan{color:var(--cyan)}.amber{color:var(--amber)}.dim{color:var(--dim)}
+.cn{font-size:44px;font-weight:600;color:#9db0c9;letter-spacing:.06em}
+.term{background:linear-gradient(180deg,#0e1520,#090e16);border:1px solid #243247;border-radius:22px;box-shadow:0 60px 140px rgba(0,0,0,.7);overflow:hidden}
+.term .bar{height:54px;display:flex;align-items:center;gap:12px;padding:0 24px;border-bottom:1px solid #1a2433;font-family:var(--mono);font-size:20px;color:var(--dim)}
+.dot{width:15px;height:15px;border-radius:50%}
+.term pre{font-family:var(--mono);font-size:22px;line-height:1.5;padding:26px 30px;white-space:pre;color:#cfe0f5}
+.cur{display:inline-block;width:.6em;height:1.1em;background:var(--lime);vertical-align:-.18em}
+.hex{color:#6e8db0}
+.tag{position:absolute;font-family:var(--mono);font-size:23px;padding:9px 20px;border-radius:999px;border:1px solid;background:rgba(5,7,11,.9);white-space:nowrap}
+.card{position:absolute;width:540px;height:290px;border-radius:26px;padding:38px;background:linear-gradient(160deg,#101826,#0a0f17);border:1px solid #243247;box-shadow:0 40px 90px rgba(0,0,0,.55)}
 .card h3{white-space:nowrap;font-size:40px;font-weight:800;letter-spacing:-.02em;margin:18px 0 12px}
 .card p{font-size:26px;line-height:1.4;color:var(--dim)}
 .card .ic{font-family:var(--mono);font-size:24px;color:var(--lime);letter-spacing:.2em}
-/* pipeline */
 .node{position:absolute;width:420px;height:230px;border-radius:26px;border:1.5px solid;padding:34px;background:rgba(10,15,23,.9)}
 .node b{display:block;font-size:46px;letter-spacing:-.02em;margin-bottom:10px}
 .node span{font-family:var(--mono);font-size:25px;color:var(--dim)}
 .arrow{position:absolute;height:4px;background:linear-gradient(90deg,var(--cyan),var(--lime));border-radius:4px;transform-origin:left}
-/* ui chrome */
 #hud{position:fixed;left:0;right:0;bottom:0;height:46px;display:flex;align-items:center;gap:14px;padding:0 18px;background:linear-gradient(transparent,rgba(0,0,0,.8));font:600 13px var(--mono);color:#9fb0c7;opacity:0;transition:opacity .3s;z-index:9}
 #wrap:hover #hud,body.paused #hud{opacity:1}
 #hud button{all:unset;cursor:pointer;padding:5px 12px;border:1px solid #2a3a50;border-radius:8px;color:#dfe9f7}
-#hud button:hover{border-color:var(--lime);color:var(--lime)}
 #bar{flex:1;height:6px;background:#1b2635;border-radius:6px;cursor:pointer;position:relative}
 #bar i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--lime),var(--cyan));border-radius:6px}
 #start{position:fixed;inset:0;z-index:10;display:grid;place-items:center;background:rgba(0,0,0,.55);cursor:pointer;backdrop-filter:blur(6px)}
-#start div{font:800 28px var(--sans);color:#fff;padding:22px 44px;border-radius:999px;background:linear-gradient(95deg,#4a8a14,#1a8ca8);box-shadow:0 0 80px rgba(77,227,255,.35)}
+#start div{font:800 28px var(--sans);color:#fff;padding:22px 44px;border-radius:999px;background:linear-gradient(95deg,#4a8a14,#1a8ca8)}
 </style>
 </head>
 <body>
 <div id="wrap">
-  <div id="stage">
-    <div class="grid" id="grid"></div>
-    <div class="glow" id="g1"></div><div class="glow" id="g2"></div>
+<div id="stage">
+  <div class="grid" id="grid"></div>
+  <div class="glow" id="g1"></div><div class="glow" id="g2"></div>
+  <canvas id="cv" width="1920" height="1080"></canvas>
 
-    <!-- S1 HOOK 0–6 -->
-    <section class="scene" id="s1">
-      <div class="abs kicker center" style="top:250px">THE PROBLEM · 问题</div>
-      <div class="abs big center" style="top:340px;font-size:150px"><span id="s1a"></span><span class="cur" id="s1c"></span></div>
-      <div class="abs big center red" id="s1b" style="top:560px;font-size:150px">Every. Single. File.</div>
-      <div class="abs cn center" id="s1c2" style="top:790px">你的 AI 助手，正在读取你的每一行代码。</div>
-    </section>
+  <!-- S1 HOOK -->
+  <section class="scene" id="s1">
+    <div class="abs kicker center" style="top:230px">THE PROBLEM · 问题</div>
+    <div class="abs big center" id="s1a" style="top:320px;font-size:104px">Your AI agent doesn't read a file.</div>
+    <div class="abs big center gradr" id="s1b" style="top:470px;font-size:140px">It reads the whole repo.</div>
+    <div class="abs cn center" id="s1c" style="top:760px">人看一行，AI 读整个仓库。</div>
+  </section>
 
-    <!-- S2 EXPOSED 6–13 -->
-    <section class="scene" id="s2">
-      <div class="abs kicker" style="left:180px;top:120px">PLAINTEXT · 明文</div>
-      <div class="abs term" style="left:180px;top:190px;width:1560px;height:560px">
-        <div class="bar"><i class="dot" style="background:#ff5f56"></i><i class="dot" style="background:#ffbd2e"></i><i class="dot" style="background:#27c93f"></i>&nbsp; ~/project — ai-agent</div>
-<pre id="s2t"></pre>
-      </div>
-      <div class="tag" id="s2tag1" style="left:1260px;top:300px;color:var(--red);border-color:var(--red)">⚠ read_file() → full source</div>
-      <div class="tag" id="s2tag2" style="left:1180px;top:640px;color:var(--red);border-color:var(--red)">⚠ indexed · embedded · uploaded</div>
-      <div class="abs big center" id="s2q" style="top:810px;font-size:92px">Your secrets are <span class="red">one grep</span> away.</div>
-      <div class="abs cn center" id="s2cn" style="top:940px">你的机密，只差一次 grep。</div>
-    </section>
+  <!-- S2 FLOOD (canvas) -->
+  <section class="scene" id="s2">
+    <div class="abs kicker" style="left:60px;top:42px">AGENT SESSION · LIVE · 信息洪流</div>
+    <div class="abs big center" id="s2q" style="top:880px;font-size:96px">You can't review what you <span class="gradr">can't keep up with.</span></div>
+    <div class="abs cn center" id="s2cn" style="top:995px">你盯不过来，机密就在无意间溜走。</div>
+  </section>
 
-    <!-- S3 LOCK 13–21 -->
-    <section class="scene" id="s3">
-      <div class="abs kicker" style="left:180px;top:120px">ONE COMMAND · 一条命令</div>
-      <div class="abs term" style="left:180px;top:190px;width:1560px;height:610px">
-        <div class="bar"><i class="dot" style="background:#ff5f56"></i><i class="dot" style="background:#ffbd2e"></i><i class="dot" style="background:#27c93f"></i>&nbsp; ~/project — terminal</div>
-<pre id="s3t"></pre>
-      </div>
-      <div class="abs big center" id="s3q" style="top:845px;font-size:100px"><span class="grad">Latch it.</span> The AI sees noise.</div>
-      <div class="abs cn center" id="s3cn" style="top:970px">一键上锁，AI 只看到乱码。</div>
-    </section>
+  <!-- S3 LOG -->
+  <section class="scene" id="s3">
+    <div class="abs kicker" style="left:180px;top:90px">WHAT THE AGENT TOOK · 它悄悄带走了什么</div>
+    <div class="abs term" style="left:180px;top:160px;width:1560px;height:610px"><div class="bar"><i class="dot" style="background:#ff5f56"></i><i class="dot" style="background:#ffbd2e"></i><i class="dot" style="background:#27c93f"></i>&nbsp; agent-session.log</div><pre id="s3t" style="font-size:27px"></pre></div>
+    <div class="abs big center" id="s3q" style="top:820px;font-size:104px"><span class="gradr">No alarm.</span> No warning. No trace.</div>
+    <div class="abs cn center" id="s3cn" style="top:960px">没有警报，没有提示，没有痕迹。</div>
+  </section>
 
-    <!-- S4 AI VIEW 21–29 -->
-    <section class="scene" id="s4">
-      <div class="abs kicker" style="left:180px;top:120px">THE AI'S VIEW · AI 的视角</div>
-      <div class="abs term" style="left:180px;top:190px;width:1560px;height:610px">
-        <div class="bar"><i class="dot" style="background:#ff5f56"></i><i class="dot" style="background:#ffbd2e"></i><i class="dot" style="background:#27c93f"></i>&nbsp; ~/project — ai-agent</div>
-<pre id="s4t"></pre>
-      </div>
-      <div class="abs big center" id="s4q" style="top:845px;font-size:100px">Zero matches. <span class="grad">Zero leaks.</span></div>
-      <div class="abs cn center" id="s4cn" style="top:970px">grep 零命中，机密零泄露。</div>
-    </section>
+  <!-- S4 REAL LOCK -->
+  <section class="scene" id="s4">
+    <div class="abs kicker" style="left:100px;top:50px">THIS IS A REAL LOCKED FILE · 这是真实的上锁文件</div>
+    <div class="abs term" id="pL" style="left:100px;top:120px;width:640px;height:690px"><div class="bar"><span class="cyan">● YOU</span>&nbsp;ailatch show</div><pre id="s4L"></pre></div>
+    <div class="abs term" id="pR" style="left:780px;top:120px;width:1040px;height:690px"><div class="bar"><span class="red">● AI AGENT</span>&nbsp;sees the same path</div><pre id="s4R" style="font-size:21px;line-height:1.46"></pre></div>
+    <div class="tag" id="s4t1" style="left:830px;top:680px;color:var(--cyan);border-color:var(--cyan)">readable header · algorithm only</div>
+    <div class="tag" id="s4t2" style="left:830px;top:740px;color:var(--amber);border-color:var(--amber)">ciphertext · 359 bytes · your code, unreadable</div>
+    <div class="abs big center" id="s4q" style="top:850px;font-size:98px">Same file. <span class="grad">Two realities.</span></div>
+    <div class="abs cn center" id="s4cn" style="top:978px">同一个文件，两个世界。</div>
+  </section>
 
-    <!-- S5 RUN 29–38 -->
-    <section class="scene" id="s5">
-      <div class="abs kicker center" style="top:90px">MEMORY-ONLY EXECUTION · 仅在内存中解密</div>
-      <div class="node" id="n1" style="left:150px;top:230px;border-color:#3a4a63"><b class="dim">DISK</b><span>secret.py<br>9d 2a 71 03 ▒▒▒▒</span></div>
-      <div class="node" id="n2" style="left:750px;top:230px;border-color:var(--cyan)"><b class="cyan">MEMORY</b><span>decrypt · in-process<br>never written back</span></div>
-      <div class="node" id="n3" style="left:1350px;top:230px;border-color:var(--lime)"><b class="lime">RUN</b><span>exec / import / open()<br>works as normal</span></div>
-      <div class="arrow" id="a1" style="left:582px;top:343px;width:150px"></div>
-      <div class="arrow" id="a2" style="left:1182px;top:343px;width:150px"></div>
-      <div class="abs term" id="s5term" style="left:380px;top:540px;width:1160px;height:260px">
-<pre id="s5t" style="padding:26px 36px"></pre>
-      </div>
-      <div class="abs big center" id="s5q" style="top:850px;font-size:92px">Disk is ciphertext. <span class="grad">Memory is truth.</span></div>
-      <div class="abs cn center" id="s5cn" style="top:975px">磁盘是密文，内存才是真相。</div>
-    </section>
+  <!-- S5 SAFE FLOOD (canvas) -->
+  <section class="scene" id="s5">
+    <div class="abs kicker" style="left:60px;top:42px">AGENT SESSION · LIVE · AILATCH ON</div>
+    <div class="abs big center" id="s5q" style="top:880px;font-size:96px">Same agent. Same speed. <span class="grad">Nothing to take.</span></div>
+    <div class="abs cn center" id="s5cn" style="top:995px">同样的 AI，同样的速度，什么也带不走。</div>
+  </section>
 
-    <!-- S6 FEATURES 38–45 -->
-    <section class="scene" id="s6">
-      <div class="abs kicker center" style="top:90px">BUILT LIKE A VAULT · 为安全而生</div>
-      <div class="card" id="c1" style="left:150px;top:200px"><div class="ic">01 / CIPHER</div><h3 class="lime">ChaCha20-Poly1305</h3><p>Authenticated encryption. Tamper → rejected.</p></div>
-      <div class="card" id="c2" style="left:690px;top:200px"><div class="ic">02 / KDF</div><h3 class="cyan">Argon2id</h3><p>Memory-hard keys. Brute force gets expensive.</p></div>
-      <div class="card" id="c3" style="left:1230px;top:200px"><div class="ic">03 / RUNTIME</div><h3 class="amber">Transparent I/O</h3><p>import, open(), Path.read_text() just work.</p></div>
-      <div class="card" id="c4" style="left:150px;top:530px"><div class="ic">04 / VIEWPORT</div><h3 class="lime">GUI Editor</h3><p>Edit plaintext. Saves back as ciphertext.</p></div>
-      <div class="card" id="c5" style="left:690px;top:530px"><div class="ic">05 / RECOVERY</div><h3 class="cyan">Never locked out</h3><p>Encrypted backups + optional recovery key.</p></div>
-      <div class="card" id="c6" style="left:1230px;top:530px"><div class="ic">06 / FREELOCK</div><h3 class="amber">JSON-RPC</h3><p>Controlled plaintext access for trusted tools.</p></div>
-      <div class="abs big center" id="s6q" style="top:880px;font-size:92px">Lock the code. <span class="grad">Keep the workflow.</span></div>
-    </section>
+  <!-- S6 RUN -->
+  <section class="scene" id="s6">
+    <div class="abs kicker center" style="top:90px">MEMORY-ONLY EXECUTION · 仅在内存中解密</div>
+    <div class="node" id="n1" style="left:150px;top:230px;border-color:#3a4a63"><b class="dim">DISK</b><span>pricing.py<br>9d 2a 71 03 ▒▒▒▒</span></div>
+    <div class="node" id="n2" style="left:750px;top:230px;border-color:var(--cyan)"><b class="cyan">MEMORY</b><span>decrypt · in-process<br>never written back</span></div>
+    <div class="node" id="n3" style="left:1350px;top:230px;border-color:var(--lime)"><b class="lime">RUN</b><span>exec / import / open()<br>works as normal</span></div>
+    <div class="arrow" id="a1" style="left:582px;top:343px;width:150px"></div>
+    <div class="arrow" id="a2" style="left:1182px;top:343px;width:150px"></div>
+    <div class="abs term" id="s6term" style="left:380px;top:540px;width:1160px;height:250px"><pre id="s6t" style="font-size:30px"></pre></div>
+    <div class="abs big center" id="s6q" style="top:850px;font-size:92px">Disk is ciphertext. <span class="grad">Memory is truth.</span></div>
+    <div class="abs cn center" id="s6cn" style="top:975px">磁盘是密文，内存才是真相。</div>
+  </section>
 
-    <!-- S7 OUTRO 45–52 -->
-    <section class="scene" id="s7">
-      <div class="abs center" id="logo" style="top:150px"><svg width="220" height="220" viewBox="0 0 120 120" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b6ff5c"/><stop offset="1" stop-color="#4de3ff"/></linearGradient></defs><path id="shackle" d="M38 54V38a22 22 0 0 1 44 0v16" stroke="url(#lg)" stroke-width="9" stroke-linecap="round"/><rect x="24" y="52" width="72" height="54" rx="14" fill="url(#lg)"/><circle cx="60" cy="76" r="7" fill="#06080c"/><rect x="57" y="78" width="6" height="14" rx="3" fill="#06080c"/></svg></div>
-      <div class="abs big center" id="s7a" style="top:400px;font-size:210px"><span class="grad">AILatch</span></div>
-      <div class="abs big center" id="s7b" style="top:640px;font-size:78px">Latch it. Run it. <span class="lime">Ship it.</span></div>
-      <div class="abs cn center" id="s7c" style="top:760px">把代码锁起来，让它照常运行。</div>
-      <div class="abs center" id="s7d" style="top:880px"><span style="font:600 38px var(--mono);padding:20px 40px;border:1px solid #2a3a50;border-radius:16px;background:#0b111a;color:var(--lime)">$ pip install ailatch</span> <span style="font:500 30px var(--mono);color:var(--dim);margin-left:30px">github.com/lo2589/AILATCH</span></div>
-    </section>
+  <!-- S7 FEATURES -->
+  <section class="scene" id="s7">
+    <div class="abs kicker center" style="top:90px">BUILT LIKE A VAULT · 为安全而生</div>
+    <div class="card" id="c1" style="left:150px;top:200px"><div class="ic">01 / CIPHER</div><h3 class="lime">ChaCha20-Poly1305</h3><p>Authenticated encryption. Tamper → rejected.</p></div>
+    <div class="card" id="c2" style="left:690px;top:200px"><div class="ic">02 / KDF</div><h3 class="cyan">Argon2id</h3><p>Memory-hard keys. Brute force gets expensive.</p></div>
+    <div class="card" id="c3" style="left:1230px;top:200px"><div class="ic">03 / RUNTIME</div><h3 class="amber">Transparent I/O</h3><p>import, open(), Path.read_text() just work.</p></div>
+    <div class="card" id="c4" style="left:150px;top:520px"><div class="ic">04 / VIEWPORT</div><h3 class="lime">GUI Editor</h3><p>Edit plaintext. Saves back as ciphertext.</p></div>
+    <div class="card" id="c5" style="left:690px;top:520px"><div class="ic">05 / RECOVERY</div><h3 class="cyan">Never locked out</h3><p>Encrypted backups + optional recovery key.</p></div>
+    <div class="card" id="c6" style="left:1230px;top:520px"><div class="ic">06 / FREELOCK</div><h3 class="amber">JSON-RPC</h3><p>Controlled plaintext access for trusted tools.</p></div>
+    <div class="abs big center" id="s7q" style="top:870px;font-size:92px">Lock the code. <span class="grad">Keep the workflow.</span></div>
+  </section>
 
-    <div class="scan"></div><div class="vig"></div>
-  </div>
-</div>
+  <!-- S8 OUTRO -->
+  <section class="scene" id="s8">
+    <div class="abs center" id="logo" style="top:140px"><svg width="220" height="220" viewBox="0 0 120 120" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b6ff5c"/><stop offset="1" stop-color="#4de3ff"/></linearGradient></defs><path id="shackle" d="M38 54V38a22 22 0 0 1 44 0v16" stroke="url(#lg)" stroke-width="9" stroke-linecap="round"/><rect x="24" y="52" width="72" height="54" rx="14" fill="url(#lg)"/><circle cx="60" cy="76" r="7" fill="#05070b"/><rect x="57" y="78" width="6" height="14" rx="3" fill="#05070b"/></svg></div>
+    <div class="abs big center" id="s8a" style="top:390px;font-size:210px"><span class="grad">AILatch</span></div>
+    <div class="abs big center" id="s8b" style="top:630px;font-size:78px">Latch it. Run it. <span class="lime">Ship it.</span></div>
+    <div class="abs cn center" id="s8c" style="top:750px">把代码锁起来，让它照常运行。</div>
+    <div class="abs center" id="s8d" style="top:870px"><span style="font:600 38px var(--mono);padding:20px 40px;border:1px solid #2a3a50;border-radius:16px;background:#0b111a;color:var(--lime)">$ pip install ailatch</span> <span style="font:500 30px var(--mono);color:var(--dim);margin-left:30px">github.com/lo2589/AILATCH</span></div>
+  </section>
 
+  <div id="flash"></div><div class="scan"></div><div class="vig"></div>
+</div></div>
 <div id="start"><div>▶ Play AILatch Film</div></div>
 <div id="hud"><button id="pp">⏸</button><button id="rs">⟲</button><div id="bar"><i></i></div><span id="tm">0:00</span><button id="fs">⛶</button></div>
 
 <script>
+const LOCK={"size": 645, "plain": 195, "hdrLen": 276, "ctStart": 286, "head": [{"off": "00000000", "hex": "9d 2a 71 03 02 00 00 00 01 14 7b 22 6b 64 66 22", "asc": ".*q.......{\"kdf\""}, {"off": "00000010", "hex": "3a 22 61 72 67 6f 6e 32 69 64 22 2c 22 61 65 61", "asc": ":\"argon2id\",\"aea"}, {"off": "00000020", "hex": "64 22 3a 22 63 68 61 63 68 61 32 30 70 6f 6c 79", "asc": "d\":\"chacha20poly"}, {"off": "00000030", "hex": "31 33 30 35 22 2c 22 73 61 6c 74 22 3a 22 49 37", "asc": "1305\",\"salt\":\"I7"}], "ct": [{"off": "00000120", "hex": "a9 93 01 6b 27 e1 ed 54 44 c3 95 30 9f 3f 9c db", "asc": "...k'..TD..0.?.."}, {"off": "00000130", "hex": "45 da f6 e1 71 76 54 e1 3a 01 ea c3 73 f0 89 90", "asc": "E...qvT.:...s..."}, {"off": "00000140", "hex": "56 79 3d c0 1d 47 32 fa 37 11 c0 5e 71 fc 1e a8", "asc": "Vy=..G2.7..^q..."}, {"off": "00000150", "hex": "b9 34 01 0f 2b 8b ae 6a 36 df 3c 4e 9a 09 3d b9", "asc": ".4..+..j6.<N..=."}, {"off": "00000160", "hex": "cb 6e 9a 4a a2 13 0f 1c 15 74 cd ca 42 d8 d1 40", "asc": ".n.J.....t..B..@"}, {"off": "00000170", "hex": "31 00 94 f2 15 bb fa 23 31 a8 52 c7 c1 39 99 10", "asc": "1......#1.R..9.."}], "ctLen": 359, "catHead": "�*q�������{\"kdf\":\"argon2id\",\"aead\":\"chacha20poly1305\",\"salt\":\"I7RNEG52N9JV7SOI/Y+zRA==\",\"nonce\":\"ROZWzLKeIqjZgyEZ\",\"created\":1791138604,\"hint\":null,\"k", "catCt": "�-���k'��TDÕ0�?��E���qvT�:���s���Vy=��G2�7��^q����4��+��j6�<N��=��n�J�����t��B��@1������#1�R��9���,+��Ы]�B_�G-�W����3'K\n���ʹ<V�V���@٦�]�y2y���@���������$ŹY\\����(�q������]D�,�v� ��i�c��̐s�#��2E�Dl&݃X}�M��V\"Q�բ��2�/�R:@�Ƅ���U����H#\"q���X�l$:���V[5Ҩ�׵AQ*�Q!H2��Cr�i-�����rS�+%�[;}�4����"};
 (()=>{
-const DUR=52;
+const DUR=61;
 const $=id=>document.getElementById(id);
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
 const ease=x=>1-Math.pow(1-clamp(x),3);
-const S={s1:[0,6],s2:[6,13],s3:[13,21],s4:[21,29],s5:[29,38],s6:[38,45],s7:[45,52]};
-
-// ---- stage scaling
+const S={s1:[0,5],s2:[5,15],s3:[15,21],s4:[21,33],s5:[33,43],s6:[43,50],s7:[50,56],s8:[56,61]};
 const stage=$('stage');
 function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`scale(${s})`}
 addEventListener('resize',fit);fit();
 
-// ---- helpers
-function fade(el,t,t0,t1,dy=24){const p=ease((t-t0)/0.6);const out=t1!=null?ease((t-t1)/0.5):0;
-  const o=clamp(p-out);el.style.opacity=o;el.style.transform=`translateY(${(1-p)*dy}px)`;}
-function typed(str,t,t0,cps=38){const n=Math.floor(clamp((t-t0)*cps,0,1e9));return str.slice(0,n)}
-function scene(el,t,[a,b]){
-  const o=clamp((t-a)/0.5)*(1-clamp((t-(b-0.5))/0.5));
-  el.style.opacity=(t>=a&&t<b)?o:0;
-  return t>=a&&t<b? t-a : -1;
-}
-// deterministic pseudo-random
+function fade(el,t,t0,dy=24){const p=ease((t-t0)/0.6);el.style.opacity=p;el.style.transform=`translateY(${(1-p)*dy}px)`}
+function typed(s,t,t0,cps=38){return s.slice(0,Math.floor(clamp((t-t0)*cps,0,1e9)))}
+function scene(el,t,[a,b]){const o=clamp((t-a)/0.4)*(1-clamp((t-(b-0.4))/0.4));el.style.opacity=(t>=a&&t<b)?o:0;return t>=a&&t<b?t-a:-1}
 function rnd(i){const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)}
-const GL='0123456789abcdef▒░▓#@$%&';
-function scramble(src,p,seed){ // p:0 plain → 1 cipher
-  let out='';for(let i=0;i<src.length;i++){const c=src[i];if(c==='\n'||c===' '){out+=c;continue}
-    const th=rnd(i+seed);out+= p>th ? GL[Math.floor(rnd(i*3+seed+Math.floor(p*40))*GL.length)] : c}
-  return out}
 const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const GL='0123456789abcdef▒░▓#@$%&';
+function scramble(src,p,seed){let o='';for(let i=0;i<src.length;i++){const c=src[i];if(c==='\n'||c===' '){o+=c;continue}const th=rnd(i+seed);o+=p>th?GL[Math.floor(rnd(i*3+seed+Math.floor(p*40))*GL.length)]:c}return o}
 
 const SRC=`import os
-API_KEY = "sk-live-9f3a77c1e2d8"      # production
+API_KEY = "sk-live-9f3a77c1e2d8"
 DB_URL  = "postgres://admin:hunter2@prod"
 
 def pricing_engine(order):
     # our secret sauce
     return order.total * 0.8731 + MARGIN`;
 
-// real ciphertext bytes captured from \`ailatch lock\` on this repo's own test run
-const HEX=`9d 2a 71 03 02 00 00 00 01 14 7b 22 6b 64 66 22
-3a 22 61 72 67 6f 6e 32 69 64 22 2c 22 61 65 61
-64 22 3a 22 63 68 61 63 68 61 32 30 70 6f 6c 79
-31 33 30 35 22 2c 22 73 61 6c 74 22 3a 22 63 64
-e1 07 5c b8 4a 90 f3 2e 6d 11 a7 c4 03 9b 58 d2
-7f 3a 8e 21 b6 c9 04 5d e8 12 af 70 39 cb 86 14`;
+// ================= FLOOD CANVAS =================
+const cv=$('cv'),cx=cv.getContext('2d');
+const DIRS=['src','lib','core','api','auth','billing','infra','models','utils','services','config','scripts','tests','deploy','internal','vendor'];
+const FILES=['index.ts','client.py','handler.go','routes.py','schema.sql','main.rs','utils.js','worker.py','session.ts','pricing.py','db.py','cache.go','queue.py','config.yaml','models.py','server.js'];
+const SECRETS=['AWS_SECRET_ACCESS_KEY=AKIA…','sk-live-9f3a77c1e2d8','postgres://admin:hunter2@prod','-----BEGIN RSA PRIVATE KEY-----','STRIPE_SECRET=sk_live_51H…','pricing_engine(): margin 0.8731','JWT_SECRET="s3cr3t-prod"','.env  DATABASE_PASSWORD','id_rsa  (ssh private key)','GITHUB_TOKEN=ghp_9aF…'];
+function pathOf(n){const a=Math.floor(rnd(n*1.7)*DIRS.length),b=Math.floor(rnd(n*2.9+5)*DIRS.length),c=Math.floor(rnd(n*4.1+9)*FILES.length);
+  return DIRS[a]+'/'+DIRS[b]+'/'+FILES[c]}
+function cipherOf(n){let s='9d 2a 71 03 ';for(let i=0;i<4;i++)s+=Math.floor(rnd(n*3+i)*256).toString(16).padStart(2,'0')+' ';return s+'…'}
+const fmt=n=>Math.floor(n).toLocaleString('en-US');
+function rr(x,y,w,h,r){cx.beginPath();cx.roundRect(x,y,w,h,r)}
 
-// ---- render(t)
+// leak events: deterministic
+const EV=[];(function(){let te=1.6;for(let k=0;k<60;k++){EV.push({te,col:Math.floor(rnd(k*7+1)*5),y:300+Math.floor(rnd(k*13+3)*18)*30,s:k%SECRETS.length});te+=Math.max(0.16,0.95-k*0.045)}})();
+
+function drawFlood(l,safe,dur){
+  cx.clearRect(0,0,1920,1080);
+  const accent=safe?'#b6ff5c':'#ff3d55';
+  const acc2=safe?'rgba(182,255,92,':'rgba(255,61,85,';
+  // intro envelope
+  const env=clamp(l/0.6);
+  // columns
+  const CW=276,X0=60,Y0=250,Y1=860,RH=29;
+  cx.save();cx.beginPath();cx.rect(X0,Y0,CW*5+20,Y1-Y0);cx.clip();
+  cx.font='18px ui-monospace,Menlo,Consolas,"DejaVu Sans Mono",monospace';
+  const ramp=1+l*0.9;
+  for(let c=0;c<5;c++){
+    const pos=(180+c*95)*l*ramp;
+    const base=Math.floor(pos/RH),off=pos%RH;
+    for(let r=-1;r<Math.ceil((Y1-Y0)/RH)+1;r++){
+      const idx=base-r+c*7919;
+      const y=Y0+r*RH+off;
+      const p=pathOf(idx);
+      const nearBeam=Math.exp(-Math.pow((y-(Y0+(Y1-Y0)*(0.5+0.45*Math.sin(l*2.2+c))))/90,2));
+      const a=(0.18+0.55*nearBeam)*env;
+      if(safe){cx.fillStyle=`rgba(125,150,180,${a*0.8})`;cx.fillText((nearBeam>0.35?cipherOf(idx):p).slice(0,26),X0+c*CW,y)}
+      else{cx.fillStyle=`rgba(77,227,255,${a})`;cx.fillText(p,X0+c*CW,y)}
+    }
+  }
+  cx.restore();
+  // column fade top/bottom
+  let g=cx.createLinearGradient(0,Y0,0,Y0+60);g.addColorStop(0,'rgba(5,7,11,1)');g.addColorStop(1,'rgba(5,7,11,0)');cx.fillStyle=g;cx.fillRect(X0-10,Y0,CW*5+30,60);
+  g=cx.createLinearGradient(0,Y1-60,0,Y1);g.addColorStop(0,'rgba(5,7,11,0)');g.addColorStop(1,'rgba(5,7,11,1)');cx.fillStyle=g;cx.fillRect(X0-10,Y1-60,CW*5+30,60);
+
+  // counters
+  const files=95*Math.pow(l,2.3)*env, lines=files*212, tokens=lines*11;
+  let leaked=0;if(!safe)for(const e of EV)if(l>e.te+1.0)leaked++;
+  const cnt=[['FILES READ',fmt(files),'#e8eef7'],['LINES SCANNED',fmt(lines),'#e8eef7'],['SECRETS EXTRACTED',safe?'0':String(leaked),accent]];
+  cnt.forEach((c,i)=>{const x=60+i*470;cx.fillStyle='#7d8aa0';cx.font='600 20px ui-monospace,Menlo,monospace';cx.fillText(c[0],x,112);
+    cx.fillStyle=c[2];cx.font='800 74px ui-monospace,Menlo,monospace';cx.fillText(c[1],x,186)});
+  const gateX=1500,destX=1640,destY=480;
+  // events
+  for(const e of EV){
+    const q=(l-e.te);if(q<0||q>2.4)continue;
+    const x0=X0+e.col*CW,y0=e.y;
+
+    if(!safe){
+      // highlight pulse on file row
+      if(q<0.5){cx.fillStyle=acc2+(0.35*(1-q/0.5))+')';cx.fillRect(x0-8,y0-22,CW-10,28)}
+      // label
+      const lab=SECRETS[e.s];cx.font='600 21px ui-monospace,Menlo,monospace';
+      const w=cx.measureText(lab).width+34;
+      const p=ease((q-0.2)/1.4);
+      const bx=x0+(destX-x0)*p-w*0.5*p, by=y0-24+(destY-(y0-24))*p;
+      cx.globalAlpha=q<0.2?q/0.2:(p>0.92?1-(p-0.92)/0.08:1);
+      cx.fillStyle='rgba(30,6,12,.92)';rr(bx,by,w,40,20);cx.fill();cx.strokeStyle=accent;cx.lineWidth=2;cx.stroke();
+      cx.fillStyle='#ffd0d6';cx.fillText('⚠ '+lab,bx+14,by+27);
+      cx.globalAlpha=1;
+    }else{
+      // attempt: shows 'ciphertext' and shatters at the gate
+      const p=ease((q-0.15)/1.0);
+      const lab='ciphertext';cx.font='600 21px ui-monospace,Menlo,monospace';
+      const bx=x0+(gateX-30-x0)*p, by=y0-24+(430-(y0-24))*p*0.35;
+      if(p<1){cx.globalAlpha=q<0.15?q/0.15:1;cx.fillStyle='rgba(18,26,38,.92)';rr(bx,by,150,38,19);cx.fill();cx.strokeStyle='#5f7a99';cx.lineWidth=1.5;cx.stroke();cx.fillStyle='#8aa4c4';cx.fillText('9d 2a 71 03…',bx+14,by+26);cx.globalAlpha=1}
+      else{ // shatter
+        const s=(q-1.15)/1.0;if(s>0&&s<1){for(let k=0;k<7;k++){const ang=(rnd(e.s*9+k)-0.5)*2.2-0.2,d=70*s*(0.6+rnd(k+e.s)),px=gateX-30+Math.cos(ang+Math.PI)*d,py=by+19+Math.sin(ang+Math.PI)*d*1.2;cx.fillStyle=`rgba(182,255,92,${1-s})`;cx.fillRect(px,py,5,5)}}
+      }
+    }
+  }
+  // right panel
+  const px=1500,py=250,pw=370,ph=470;
+  if(!safe){
+    const pulse=0.5+0.5*Math.sin(l*8);
+    cx.shadowColor='rgba(255,61,85,.6)';cx.shadowBlur=30+20*pulse;
+    cx.strokeStyle=accent;cx.lineWidth=2.5;rr(px+110,py,pw-110,ph,22);cx.stroke();cx.shadowBlur=0;
+    cx.fillStyle='rgba(40,6,14,.55)';rr(px+110,py,pw-110,ph,22);cx.fill();
+    cx.fillStyle=accent;cx.font='700 22px ui-monospace,Menlo,monospace';cx.fillText('MODEL CONTEXT',px+130,py+44);
+    cx.fillStyle='#ffb3bd';cx.font='500 18px ui-monospace,Menlo,monospace';cx.fillText('→ cloud · logs · training?',px+130,py+72);
+    // list of recent leaks
+    const got=EV.filter(e=>l>e.te+1.2).slice(-8).reverse();
+    cx.font='500 17px ui-monospace,Menlo,monospace';
+    got.forEach((e,i)=>{cx.fillStyle=`rgba(255,160,170,${1-i*0.11})`;cx.fillText(SECRETS[e.s].slice(0,23),px+130,py+112+i*38)});
+  }else{
+    // shield gate
+    const pulse=0.5+0.5*Math.sin(l*5);
+    cx.shadowColor='rgba(182,255,92,.55)';cx.shadowBlur=26+14*pulse;
+    cx.strokeStyle=accent;cx.lineWidth=5;cx.beginPath();cx.moveTo(gateX-10,py);cx.lineTo(gateX-10,py+ph);cx.stroke();cx.shadowBlur=0;
+    cx.fillStyle='rgba(182,255,92,.07)';cx.fillRect(gateX-10,py,pw+20,ph);
+    cx.fillStyle=accent;cx.font='700 22px ui-monospace,Menlo,monospace';cx.fillText('AILATCH GATE',gateX+30,py+44);
+    cx.fillStyle='#c9f59a';cx.font='500 18px ui-monospace,Menlo,monospace';
+    ['✕ no plaintext','✕ nothing to index','✕ nothing to embed','✕ nothing to leak'].forEach((s,i)=>{cx.globalAlpha=ease((l-1-i*0.5)/0.5);cx.fillText(s,gateX+30,py+100+i*44);cx.globalAlpha=1});
+    // big shield
+    cx.strokeStyle=accent;cx.lineWidth=6;cx.beginPath();cx.moveTo(gateX+190,py+300);cx.lineTo(gateX+250,py+322);cx.lineTo(gateX+250,py+372);cx.quadraticCurveTo(gateX+250,py+420,gateX+190,py+445);cx.quadraticCurveTo(gateX+130,py+420,gateX+130,py+372);cx.lineTo(gateX+130,py+322);cx.closePath();cx.stroke();
+    cx.beginPath();cx.moveTo(gateX+165,py+375);cx.lineTo(gateX+185,py+397);cx.lineTo(gateX+220,py+350);cx.stroke();
+  }
+  // human vs AI bars
+  const by0=745;
+  cx.font='600 19px ui-monospace,Menlo,monospace';
+  cx.fillStyle='#7d8aa0';cx.fillText('AI AGENT  files/min',1500,by0+22);
+  const aw=clamp(l/3)*370;cx.fillStyle=safe?'rgba(182,255,92,.8)':'rgba(255,61,85,.85)';rr(1500,by0+34,aw,16,8);cx.fill();
+  cx.fillStyle='#7d8aa0';cx.fillText('YOU  files/min',1500,by0+92);
+  cx.fillStyle='#4de3ff';rr(1500,by0+104,clamp(l/3)*6,16,8);cx.fill();
+  cx.fillStyle='#4de3ff';cx.fillText(safe?'':'← no way to keep up',1515,by0+138);
+  // footnote
+  cx.fillStyle='rgba(125,138,160,.6)';cx.font='500 15px ui-monospace,Menlo,monospace';cx.fillText('Illustrative simulation · 示意动画',60,1060);
+}
+
+// ================= render =================
 function render(t){
   t=clamp(t,0,DUR-0.001);
-  // ambient motion
-  $('g1').style.transform=`translate(${Math.sin(t*.3)*80}px,${t*6}px)`;
-  $('g2').style.transform=`translate(${-Math.cos(t*.25)*90}px,${-t*5}px)`;
+  const danger=(t>=5&&t<21)||(t<5&&t>2.6);
+  const col=(t>=33&&t<50)||(t>=50)?'#4de3ff':(danger?'#ff3d55':'#4de3ff');
+  $('g1').style.background=col;$('g2').style.background=(t>=5&&t<21)?'#ff3d55':'#b6ff5c';
+  $('g1').style.transform=`translate(${Math.sin(t*.3)*80}px,${t*5}px)`;
+  $('g2').style.transform=`translate(${-Math.cos(t*.25)*90}px,${-t*4}px)`;
   $('grid').style.transform=`translateY(${(t*14)%80}px)`;
-  // glow color follows narrative: danger → safe
-  $('g1').style.background = (t>=6&&t<13)?'#ff5d6c':'#4de3ff';
 
-  // S1
   let l=scene($('s1'),t,S.s1);
-  if(l>=0){
-    const A='Your AI reads';
-    const a=typed(A,l,0.3,22);$('s1a').textContent=a;
-    $('s1c').style.display=(a.length<A.length||l<2.2)?'inline-block':'none';
-    fade($('s1b'),l,2.4);fade($('s1c2'),l,3.4);
-    $('s1b').style.top=(560)+'px';
-  }
-  // S2
+  if(l>=0){fade($('s1a'),l,0.3);fade($('s1b'),l,1.5);fade($('s1c'),l,2.8);
+    // glitch on s1b
+    const gl=l>1.5&&l<1.9?(rnd(Math.floor(l*40))-0.5)*24:0;$('s1b').style.transform+=` translateX(${gl}px)`}
+
   l=scene($('s2'),t,S.s2);
-  if(l>=0){
-    const cmd='$ cat pricing.py\n';
-    const full=cmd+SRC;
-    const txt=typed(full,l,0.4,60);
-    let h=esc(txt).replace(/(sk-live-[0-9a-f]+)/,'<span class="red">$1</span>').replace(/(hunter2)/,'<span class="red">$1</span>').replace(/(# .*)/g,'<span class="dim">$1</span>').replace(/^(\$ cat pricing\.py)/,'<span class="lime">$1</span>');
-    $('s2t').innerHTML=h;
-    fade($('s2tag1'),l,3.0);fade($('s2tag2'),l,3.6);
-    fade($('s2q'),l,4.2);fade($('s2cn'),l,5.0);
-  }
-  // S3
+  cx.clearRect(0,0,1920,1080);
+  if(l>=0){drawFlood(l,false);fade($('s2q'),l,6.2);fade($('s2cn'),l,7.2)}
+  l=scene($('s5'),t,S.s5);
+  if(l>=0){drawFlood(l,true);fade($('s5q'),l,6.0);fade($('s5cn'),l,7.0)}
+
   l=scene($('s3'),t,S.s3);
   if(l>=0){
-    const c1=typed('$ ailatch lock pricing.py',l,0.3,30);
-    let o=c1;
-    if(l>1.2){o='$ ailatch lock pricing.py\n';
-      const p=clamp((l-1.6)/3.0);
-      const body=p<1? scramble(SRC,p,7): null;
-      if(p<1){o+='\n'+body}
-      else {o+='  <LOCK>  locked: pricing.py\n\n'+HEX.split('\n').slice(0,4).join('\n')+'\n…'}
-    }
-    let h=esc(o);
-    if(l>1.2){h=h.replace(/^(\$ ailatch lock pricing\.py)/,'<span class="lime">$1</span>').replace('&lt;LOCK&gt;','<span class="lime">✔</span>')}
-    else h='<span class="lime">'+h+'</span><span class="cur"></span>';
-    if(l>=4.6) h=h.replace(/\n([0-9a-f]{2} .*)/s,(m)=>'\n<span class="hex">'+m.slice(1)+'</span>');
+    const rows=[['.env','DATABASE_PASSWORD'],['config/secrets.yaml','STRIPE_SECRET'],['~/.ssh/id_rsa','private key'],['src/pricing.py','pricing algorithm'],['billing/keys.py','sk-live-9f3a…'],['infra/deploy.sh','AWS_SECRET_ACCESS_KEY']];
+    let h='';
+    rows.forEach((r,i)=>{if(l>0.5+i*0.55){h+=`<span class="dim">14:02:${String(7+i).padStart(2,'0')}</span>  <span class="cyan">read</span>  ${esc(r[0].padEnd(24))}<span class="red">⚠ ${esc(r[1])}</span>\n`}});
+    if(l>4.0)h+=`\n<span class="amber">human alerts raised:</span>  <span class="red">0</span>\n<span class="amber">secrets now in model context:</span>  <span class="red">${rows.length}</span>`;
     $('s3t').innerHTML=h;
-    fade($('s3q'),l,5.2);fade($('s3cn'),l,6.0);
+    fade($('s3q'),l,3.6);fade($('s3cn'),l,4.4);
   }
-  // S4
+
   l=scene($('s4'),t,S.s4);
   if(l>=0){
-    let o='';
-    const c1='$ grep -rn "sk-live" .\n';
-    const c2='$ cat pricing.py | head -c 64\n';
-    o+=typed(c1,l,0.3,34);
-    let h=esc(o);
-    if(l>2.0){h='<span class="lime">$ grep -rn "sk-live" .</span>\n<span class="amber">0 matches</span>\n\n'}
-    if(l>3.2){h+='<span class="lime">'+esc(typed(c2,l,3.2,34))+'</span>';}
-    if(l>4.8){h='<span class="lime">$ grep -rn "sk-live" .</span>\n<span class="amber">0 matches</span>\n\n<span class="lime">$ cat pricing.py | head -c 64</span>\n<span class="hex">'+HEX.split('\n').slice(0,4).join('\n')+'</span>\n'+'<span class="dim">binary ciphertext — nothing to index, nothing to learn.</span>'}
-    $('s4t').innerHTML=h;
-    fade($('s4q'),l,5.6);fade($('s4cn'),l,6.4);
-  }
-  // S5
-  l=scene($('s5'),t,S.s5);
+    const P=LOCK;
+    // phase A (0–2.4): plaintext on disk. B (2.4-3.4): lock flash. C: locked
+    const locked=l>3.0;
+    let L='',R='';
+    if(l<3.0){
+      L='<span class="lime">$ cat pricing.py</span>   <span class="dim">195 B</span>\n'+esc(typed(SRC,l,0.3,90));
+      R='<span class="dim">waiting…</span>';
+      if(l>1.8){L+='\n\n<span class="lime">$ ailatch lock pricing.py</span>'+(l>2.4?'\n<span class="lime">  ✔ locked</span>':'')}
+    }else{
+      L='<span class="lime">$ ailatch show pricing.py</span>   <span class="dim">in memory</span>\n'+esc(SRC)+'\n\n<span class="dim"># on disk: ciphertext · you: plaintext</span>';
+      // right: cat (3.0-7.0) then hexdump
+      const wrap=s=>s.match(/.{1,64}/gs)||[];
+      const q=l-3.0;
+      let r='<span class="lime">$ cat pricing.py</span>   <span class="dim">'+P.size+' B</span>\n';
+      const head=esc(wrap(P.catHead.replace(/\n/g,'⏎')).slice(0,3).join('\n'));
+      const ct=esc(wrap(P.catCt.replace(/\n/g,'⏎')).slice(0,4).join('\n'));
+      const full=head+'\n<span class="dim">⋮</span>\n'+ct;
+      if(q<4.2){
+        const nn=Math.floor(q*300);r+='<span class="hex">'+(nn>=full.length?full:esc(full.slice(0,0))+full.slice(0,nn).replace(/<[^>]*$/,''))+'</span>';
+      }else{
+        r='<span class="lime">$ xxd pricing.py | head</span>   <span class="dim">'+P.size+' B</span>\n';
+        P.head.slice(0,3).forEach(w=>{r+=`<span class="dim">${w.off}</span>  <span class="cyan">${w.hex}</span>  <span class="cyan">${esc(w.asc)}</span>\n`});
+        r+='<span class="dim">     ⋮   header JSON · 276 B   ⋮</span>\n';
+        const nrows=Math.min(P.ct.length,Math.floor((q-4.4)*6)+0);
+        P.ct.slice(0,Math.max(0,nrows)).forEach(w=>{r+=`<span class="dim">${w.off}</span>  <span class="amber">${w.hex}</span>  <span class="amber">${esc(w.asc)}</span>\n`});
+        r+=nrows>=P.ct.length?'<span class="dim">     ⋮   </span><span class="red">no "sk-live" · no "hunter2" · nothing</span>':'';
+      }
+      R=r;
+    }
+    $('s4L').innerHTML=L;$('s4R').innerHTML=R;
+    // right panel red scan shake
+    $('pR').style.borderColor=locked?'#ff3d55':'#243247';
+    $('pL').style.borderColor=locked?'#4de3ff':'#243247';
+    // flash on lock moment
+    const fl=clamp(1-Math.abs(l-2.7)/0.25)*0.5;$('flash').style.opacity=fl;
+    fade($('s4t1'),l,7.6);fade($('s4t2'),l,9.0);
+    fade($('s4q'),l,9.4);fade($('s4cn'),l,10.2);
+    $('s4t1').style.opacity=l>7.6?Math.min(ease((l-7.6)/0.5),1):0;
+    // header/ciphertext tags only after hexdump begins
+  }else $('flash').style.opacity=0;
+
+  l=scene($('s6'),t,S.s6);
   if(l>=0){
     fade($('n1'),l,0.2);fade($('n2'),l,1.0);fade($('n3'),l,1.8);
     const g=(el,t0)=>{el.style.opacity=ease((l-t0)/0.5);el.style.transform=`scaleX(${ease((l-t0)/0.7)})`};
-    g($('a1'),0.8);g($('a2'),1.6);
-    fade($('s5term'),l,2.6);
+    g($('a1'),0.8);g($('a2'),1.6);fade($('s6term'),l,2.4);
     let h='<span class="lime">$ ailatch run app.py</span>\n';
-    if(l>3.6)h+='RESULT: <span class="lime">SECRET-ALGO-7</span>\n';
-    if(l>4.4)h+='<span class="dim">$ cat helper.py | grep SECRET   # on disk</span>\n<span class="amber">(no output — still ciphertext)</span>';
-    $('s5t').innerHTML=l>2.9?h:'<span class="lime">$ ailatch run app.py</span><span class="cur"></span>';
-    fade($('s5q'),l,5.6);fade($('s5cn'),l,6.6);
+    if(l>3.3)h+='RESULT: <span class="lime">SECRET-ALGO-7</span>\n';
+    if(l>4.0)h+='<span class="dim">$ grep SECRET pricing.py   # on disk</span>\n<span class="amber">(no output — still ciphertext)</span>';
+    $('s6t').innerHTML=l>2.7?h:'<span class="lime">$ ailatch run app.py</span><span class="cur"></span>';
+    fade($('s6q'),l,4.6);fade($('s6cn'),l,5.4);
   }
-  // S6
-  l=scene($('s6'),t,S.s6);
-  if(l>=0){['c1','c2','c3','c4','c5','c6'].forEach((id,i)=>fade($(id),l,0.2+i*0.35,null,40));
-    fade($('s6q'),l,3.2);}
-  // S7
   l=scene($('s7'),t,S.s7);
-  if(l>=0){
-    fade($('logo'),l,0.1,null,-30);
-    $('shackle').style.transform=`translateY(${(1-ease((l-0.4)/0.8))*-14}px)`;
-    fade($('s7a'),l,0.5);fade($('s7b'),l,1.5);fade($('s7c'),l,2.3);fade($('s7d'),l,3.2);
-  }
+  if(l>=0){['c1','c2','c3','c4','c5','c6'].forEach((id,i)=>fade($(id),l,0.2+i*0.3,40));fade($('s7q'),l,2.8)}
+  l=scene($('s8'),t,S.s8);
+  if(l>=0){fade($('logo'),l,0.1,-30);$('shackle').style.transform=`translateY(${(1-ease((l-0.4)/0.8))*-14}px)`;
+    fade($('s8a'),l,0.5);fade($('s8b'),l,1.5);fade($('s8c'),l,2.3);fade($('s8d'),l,3.2)}
+  if(!(t>=21&&t<33))$('flash').style.opacity=0;
   $('bar').firstElementChild.style.width=(t/DUR*100)+'%';
-  const m=Math.floor(t/60),s=Math.floor(t%60);$('tm').textContent=m+':'+String(s).padStart(2,'0')+' / 0:52';
+  $('tm').textContent='0:'+String(Math.floor(t)).padStart(2,'0')+' / 1:01';
 }
-
-// ---- clock
 let t=0,playing=false,last=0;
-function loop(ts){
-  if(playing){t+=(ts-last)/1000;if(t>=DUR){t=0}}
-  last=ts;render(t);requestAnimationFrame(loop)}
+function loop(ts){if(playing){t+=(ts-last)/1000;if(t>=DUR)t=0}last=ts;render(t);requestAnimationFrame(loop)}
 function setPlay(p){playing=p;$('pp').textContent=p?'⏸':'▶';document.body.classList.toggle('paused',!p)}
 $('start').onclick=()=>{$('start').style.display='none';setPlay(true)};
-$('pp').onclick=()=>setPlay(!playing);
-$('rs').onclick=()=>{t=0};
+$('pp').onclick=()=>setPlay(!playing);$('rs').onclick=()=>{t=0};
 $('fs').onclick=()=>{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()};
 $('bar').onclick=e=>{const r=$('bar').getBoundingClientRect();t=(e.clientX-r.left)/r.width*DUR};
-addEventListener('keydown',e=>{
-  if(e.code==='Space'){e.preventDefault();$('start').style.display='none';setPlay(!playing)}
-  if(e.code==='ArrowRight')t=Math.min(DUR-.1,t+2);
-  if(e.code==='ArrowLeft')t=Math.max(0,t-2);
-  if(e.key==='f')$('fs').click();
-});
-// hooks for automated capture
+addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();$('start').style.display='none';setPlay(!playing)}
+  if(e.code==='ArrowRight')t=Math.min(DUR-.1,t+2);if(e.code==='ArrowLeft')t=Math.max(0,t-2);if(e.key==='f')$('fs').click()});
 window.__seek=x=>{t=x;render(t)};
 const q=new URLSearchParams(location.search);
 if(q.has('t')){t=+q.get('t');$('start').style.display='none';setPlay(false)}
