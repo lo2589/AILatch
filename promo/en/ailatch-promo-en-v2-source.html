@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AILatch — Film</title>
+<link rel="stylesheet" href="assets/fonts.css">
+<style>
+:root{
+  --lime:#b6ff5c; --cyan:#53e7ff; --amber:#ffb454; --red:#ff3b57; --violet:#9b7bff;
+  --text:#eef3fb; --dim:#8fa0b8;
+  --sans:'Inter','Noto SC',system-ui,sans-serif;
+  --disp:'Space Grotesk','Noto SC',system-ui,sans-serif;
+  --mono:'JBMono',ui-monospace,Menlo,Consolas,monospace;
+  --cn:'Noto SC','Inter',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#03040a;overflow:hidden}
+#wrap{position:fixed;inset:0;display:grid;place-items:center;background:#000}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:center;flex:none;overflow:hidden;background:#03040a}
+#gl2{position:absolute;inset:0;width:1920px;height:1080px;z-index:1}
+#ui{position:absolute;inset:0;width:1920px;height:1080px;z-index:5}
+.scene{position:absolute;inset:0;opacity:0}
+.abs{position:absolute}.ctr{left:0;right:0;text-align:center}
+.disp{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;line-height:.98;color:var(--text);text-shadow:0 2px 40px rgba(2,4,10,.9),0 0 90px rgba(2,4,10,.6)}
+.cn{font-family:'Inter',sans-serif;font-weight:600;color:#cdd8ea;letter-spacing:0}
+.kick{font-family:var(--mono);font-weight:700;font-size:24px;letter-spacing:.42em;text-transform:uppercase;color:var(--dim)}
+.mono{font-family:var(--mono)}
+.gradC{background:linear-gradient(100deg,var(--lime),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+.gradR{background:linear-gradient(100deg,#ff7a5c,var(--red));-webkit-background-clip:text;background-clip:text;color:transparent}
+.red{color:var(--red)}.lime{color:var(--lime)}.cyan{color:var(--cyan)}.amber{color:var(--amber)}.dim{color:var(--dim)}
+.vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 92% 80% at 50% 50%,transparent 18%,rgba(2,3,8,.55) 55%,rgba(2,3,8,.92) 100%)}
+.scan{position:absolute;inset:0;pointer-events:none;mix-blend-mode:overlay;opacity:.5;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px)}
+.grain{position:absolute;inset:-50%;pointer-events:none;opacity:.05;mix-blend-mode:overlay}
+#flash{position:absolute;inset:0;background:#dffcff;opacity:0;pointer-events:none;mix-blend-mode:screen}
+/* terminal */
+.term{position:absolute;border-radius:18px;overflow:hidden;background:linear-gradient(180deg,rgba(14,20,30,.86),rgba(8,12,19,.9));border:1px solid rgba(90,120,160,.28);box-shadow:0 50px 120px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05);backdrop-filter:blur(8px)}
+.term .tb{height:48px;display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid rgba(90,120,160,.18);font:600 18px var(--mono);color:var(--dim)}
+.dot{width:13px;height:13px;border-radius:50%}
+.term pre{font:500 23px/1.5 var(--mono);padding:24px 28px;white-space:pre;color:#d6e4f6}
+.hex{color:#7f9cc0}
+.tag{position:absolute;font:600 22px var(--mono);padding:9px 18px;border-radius:999px;border:1px solid;background:rgba(3,4,10,.78);white-space:nowrap;backdrop-filter:blur(4px)}
+/* feature chips */
+.feat{position:absolute;width:430px;border-radius:20px;padding:30px 32px;background:linear-gradient(165deg,rgba(18,26,40,.82),rgba(8,12,20,.8));border:1px solid rgba(90,120,160,.26);box-shadow:0 30px 70px rgba(0,0,0,.5);backdrop-filter:blur(6px)}
+.feat .n{font:700 20px var(--mono);letter-spacing:.24em;color:var(--lime)}
+.feat h3{font:700 34px/1 var(--disp);letter-spacing:-.02em;margin:14px 0 10px;color:var(--text)}
+.feat p{font:600 22px/1.35 var(--sans);color:var(--dim)}
+/* brand */
+#brand{position:absolute;right:52px;top:34px;display:flex;align-items:center;gap:13px;opacity:.9;z-index:8}
+#brand .nm{font:700 25px var(--disp);color:#eef3fb;line-height:1}
+#brand .hd{font:600 17px var(--mono);color:var(--lime);line-height:1.3}
+#sim{position:absolute;left:54px;bottom:30px;font:600 15px var(--mono);color:rgba(140,155,180,.5);z-index:8}
+/* progress / controls (hidden in render) */
+#hud{position:fixed;left:0;right:0;bottom:0;height:44px;display:flex;align-items:center;gap:14px;padding:0 18px;background:linear-gradient(transparent,rgba(0,0,0,.8));font:600 12px var(--mono);color:#9fb0c7;opacity:0;transition:.2s;z-index:20}
+#wrap:hover #hud,body.paused #hud{opacity:1}
+#hud button{all:unset;cursor:pointer;padding:5px 11px;border:1px solid #2a3a50;border-radius:7px;color:#dfe9f7}
+#bar{flex:1;height:5px;background:#1b2635;border-radius:5px;cursor:pointer;position:relative}
+#bar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--lime),var(--cyan));border-radius:5px}
+#start{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:rgba(0,0,0,.6);cursor:pointer;backdrop-filter:blur(8px)}
+#start div{font:700 26px var(--disp);color:#fff;padding:20px 42px;border-radius:999px;background:linear-gradient(100deg,#4e8f17,#1a8ca8);box-shadow:0 0 70px rgba(83,231,255,.4)}
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage">
+  <canvas id="gl2" width="1920" height="1080"></canvas>
+  <div id="ui">
+    <div id="ov"></div>
+    <div class="scan"></div><div class="vig"></div>
+  </div>
+</div></div>
+
+<div id="start"><div>▶ Play AILatch Film</div></div>
+<div id="hud"><button id="pp">⏸</button><button id="rs">⟲</button><div id="bar"><i></i></div><span id="tm">0:00</span><button id="fs">⛶</button></div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "./node_modules/three/build/three.module.js",
+  "three/addons/": "./node_modules/three/examples/jsm/"
+}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+const LOCK = window.__LOCK__ || {size:645,head:[],ct:[],catHead:'',catCt:''};
+const W=1920,H=1080, DUR=54;
+const $=id=>document.getElementById(id);
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const smooth=x=>{x=clamp(x);return x*x*(3-2*x);};
+const ease=x=>1-Math.pow(1-clamp(x),3);
+const easeIO=x=>{x=clamp(x);return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;};
+function rnd(i){const x=Math.sin(i*127.13+311.7)*43758.545;return x-Math.floor(x);}
+
+// scene windows [start,end]
+const SC={s0:[0,5],s1:[5,14],s2:[14,19],s3:[19,28],s4:[28,36],s5:[36,43.5],s6:[43.5,54]};
+
+/* ================= THREE SETUP ================= */
+const glCanvas=document.createElement('canvas');glCanvas.width=W;glCanvas.height=H;
+const renderer=new THREE.WebGLRenderer({canvas:glCanvas,antialias:true,alpha:false,preserveDrawingBuffer:true});
+const ctx2=$('gl2').getContext('2d');
+renderer.setPixelRatio(1);renderer.setSize(W,H,false);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=0.92;
+const scene=new THREE.Scene();
+scene.fog=new THREE.FogExp2(0x03040a,0.016);
+const camera=new THREE.PerspectiveCamera(52,W/H,0.1,400);
+camera.position.set(0,0,48);
+
+// ---- CODE RIVER (points) ----
+const LINES=1500, PERLINE=16, NP=LINES*PERLINE;
+const pos=new Float32Array(NP*3), col=new Float32Array(NP*3), siz=new Float32Array(NP);
+const base=new Float32Array(NP*3), lineSpeed=new Float32Array(LINES), lineSecret=new Uint8Array(LINES), charBright=new Float32Array(NP);
+const Zmin=-150, Zmax=18, span=Zmax-Zmin;
+for(let l=0;l<LINES;l++){
+  const lx=(rnd(l*2.1)-0.5)*70, ly=(rnd(l*3.3+1)-0.5)*44, lz=Zmin+rnd(l*1.7+5)*span;
+  const len=0.5+rnd(l*5.1)*1.1; lineSpeed[l]=6+rnd(l*7.7)*9;
+  lineSecret[l]= rnd(l*9.3+2)<0.07 ?1:0;
+  for(let p=0;p<PERLINE;p++){
+    const i=l*PERLINE+p, k=i*3;
+    base[k]=lx+p*len; base[k+1]=ly; base[k+2]=lz;
+    charBright[i]=0.35+rnd(i*4.4)*0.65;
+    siz[i]=(rnd(i*2.2)<0.5?1.0:1.7)* (lineSecret[l]?1.5:1);
+  }
+}
+pos.set(base);
+const g=new THREE.BufferGeometry();
+g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+g.setAttribute('color',new THREE.BufferAttribute(col,3));
+g.setAttribute('asize',new THREE.BufferAttribute(siz,1));
+const pmat=new THREE.ShaderMaterial({
+  uniforms:{uScale:{value:H/3.6}},
+  vertexShader:`attribute float asize;attribute vec3 color;varying vec3 vc;uniform float uScale;
+    void main(){vc=color;vec4 mv=modelViewMatrix*vec4(position,1.0);
+    gl_PointSize=asize*uScale/max(-mv.z,1.0);gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`varying vec3 vc;void main(){vec2 d=gl_PointCoord-0.5;float r=dot(d,d);
+    float a=smoothstep(0.25,0.0,r);if(a<0.01)discard;gl_FragColor=vec4(vc,a);}`,
+  transparent:true,blending:THREE.AdditiveBlending,depthWrite:false
+});
+const river=new THREE.Points(g,pmat);scene.add(river);
+
+// ---- AI CORE ----
+const coreG=new THREE.IcosahedronGeometry(5,2);
+const coreMat=new THREE.MeshStandardMaterial({color:0x0a0c14,emissive:0xff2a44,emissiveIntensity:0.6,metalness:0.9,roughness:0.25,flatShading:true});
+const core=new THREE.Mesh(coreG,coreMat);core.position.set(0,0,-6);scene.add(core);
+const coreWire=new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(5.25,1)),new THREE.LineBasicMaterial({color:0xff3b57,transparent:true,opacity:0.5}));
+core.add(coreWire);
+const halo=new THREE.Mesh(new THREE.SphereGeometry(7.4,32,32),new THREE.MeshBasicMaterial({color:0xff3b57,transparent:true,opacity:0.0,side:THREE.BackSide,blending:THREE.AdditiveBlending}));
+core.add(halo);
+
+// ---- LOCK (hidden until S2) ----
+const lock=new THREE.Group();lock.position.set(0,0,-6);lock.visible=false;scene.add(lock);
+const bodyMat=new THREE.MeshStandardMaterial({color:0x0c1018,emissive:0x3a8f28,emissiveIntensity:1.2,metalness:0.85,roughness:0.28,flatShading:false});
+const body=new THREE.Mesh(new THREE.BoxGeometry(7.2,5.6,3.2),bodyMat);
+// round-ish: scale a bit
+body.geometry.translate(0,-0.4,0);
+lock.add(body);
+const shackleMat=new THREE.MeshStandardMaterial({color:0x0c1018,emissive:0x1f7a84,emissiveIntensity:1.0,metalness:0.9,roughness:0.22});
+const shackle=new THREE.Mesh(new THREE.TorusGeometry(2.4,0.62,20,40,Math.PI),shackleMat);
+shackle.position.set(0,3.0,0);lock.add(shackle);
+const sl=new THREE.Mesh(new THREE.CylinderGeometry(0.62,0.62,2.2,20),shackleMat);sl.position.set(-2.4,1.9,0);lock.add(sl);
+const sr=sl.clone();sr.position.x=2.4;lock.add(sr);
+const keyG=new THREE.Mesh(new THREE.CircleGeometry(0.72,24),new THREE.MeshBasicMaterial({color:0x03040a}));keyG.position.set(0,-0.2,1.61);lock.add(keyG);
+const lockEdges=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(7.2,5.6,3.2)),new THREE.LineBasicMaterial({color:0x8affc0,transparent:true,opacity:0.6}));
+lockEdges.position.y=-0.4;lock.add(lockEdges);
+const lockHalo=new THREE.Mesh(new THREE.SphereGeometry(8.5,24,24),new THREE.MeshBasicMaterial({color:0x6effb0,transparent:true,opacity:0.0,side:THREE.BackSide,blending:THREE.AdditiveBlending}));
+lock.add(lockHalo);
+
+// ---- SHIELD ring ----
+const shield=new THREE.Mesh(new THREE.TorusGeometry(11,0.14,12,96),new THREE.MeshBasicMaterial({color:0x6effb0,transparent:true,opacity:0,blending:THREE.AdditiveBlending}));
+shield.position.set(0,0,-6);scene.add(shield);
+
+// lights
+const key=new THREE.PointLight(0xffffff,180,120);key.position.set(14,16,24);scene.add(key);
+const fill=new THREE.PointLight(0x4e7bff,90,120);fill.position.set(-18,-10,10);scene.add(fill);
+scene.add(new THREE.AmbientLight(0x202838,1.4));
+
+// ---- postfx ----
+const composer=new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene,camera));
+const bloom=new UnrealBloomPass(new THREE.Vector2(W/2,H/2),0.62,0.5,0.72);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+// color palettes for particles
+const C_READ=new THREE.Color(0x66b8ff), C_WHITE=new THREE.Color(0xdff0ff), C_RED=new THREE.Color(0xff3b57), C_LIME=new THREE.Color(0xb6ff5c), C_CY=new THREE.Color(0x53e7ff);
+const tmpC=new THREE.Color();
+
+function updateRiver(t){
+  // phase: 0 readable(cyan) danger .. after lock -> scrambled lime
+  const lockT=SC.s2[0]+1.4;            // moment code scrambles
+  const scr=clamp((t-lockT)/2.2);      // 0..1 scramble progress
+  const fl1=Math.floor(t*10);
+  const P=g.attributes.position.array, C=g.attributes.color.array;
+  // overall flow speed: fast in danger, calm after
+  const danger= t<lockT;
+  for(let l=0;l<LINES;l++){
+    const spd=lineSpeed[l]*(danger?1.0:0.4);
+    for(let p=0;p<PERLINE;p++){
+      const i=l*PERLINE+p,k=i*3;
+      let z=base[k+2]+t*spd;
+      z=((z-Zmin)%span+span)%span+Zmin;
+      // pull toward core in danger as they near front
+      const near=clamp((z-( -40))/58);     // 0 far .. 1 near front
+      const pull= danger? near*near*0.30 : 0;
+      let x=base[k]*(1-pull*0.6), y=base[k+1]*(1-pull*0.25);
+      // scramble jitter
+      if(scr>0){const j=scr*1.1;x+=(rnd(i*3.1+fl1)-0.5)*j;y+=(rnd(i*5.7+fl1+9)-0.5)*j;}
+      P[k]=x;P[k+1]=y;P[k+2]=z;
+      // color
+      let br=charBright[i];
+      if(lineSecret[l]&&danger){tmpC.copy(C_RED);br*=0.9+0.25*Math.sin(t*9+l);}
+      else if(scr<=0){ tmpC.copy(C_READ).lerp(C_WHITE, br*0.4); if(danger)tmpC.lerp(C_RED,0.12);}
+      else{ tmpC.copy(C_LIME).lerp(C_CY, 0.3+0.4*rnd(i)); }
+      const dim=(0.10+0.90*clamp((z+70)/90))*0.6; // fade in from depth
+      C[k]=tmpC.r*br*dim;C[k+1]=tmpC.g*br*dim;C[k+2]=tmpC.b*br*dim;
+    }
+  }
+  g.attributes.position.needsUpdate=true;g.attributes.color.needsUpdate=true;
+}
+
+/* ============ CAMERA + OBJECT CHOREO ============ */
+function cam(t){
+  // keyframed dolly; mostly looking at origin-ish
+  let px=0,py=0,pz=48, lx=0,ly=0,lz=-6;
+  if(t<5){const u=easeIO(t/5);pz=lerp(70,40,u);py=lerp(6,0,u);px=lerp(-8,0,u)*0.4;}
+  else if(t<14){const u=easeIO((t-5)/9);pz=lerp(40,34,u);px=Math.sin(t*0.18)*5;py=Math.sin(t*0.14)*3+1;}
+  else if(t<19){const u=easeIO((t-14)/5);pz=lerp(34,30,u);px=lerp(Math.sin(14*0.18)*5,0,u);py=lerp(4,0,u);}
+  else if(t<28){const u=easeIO((t-19)/9);pz=lerp(30,33,u);px=Math.sin(t*0.12)*4;py=1;}
+  else if(t<36){const u=easeIO((t-28)/8);pz=lerp(33,31,u);px=lerp(Math.sin(28*.12)*4,0,u);py=lerp(1,0,u);}
+  else if(t<43.5){const u=easeIO((t-36)/7.5);pz=lerp(31,36,u);py=Math.sin(t*0.1)*2;px=Math.sin(t*0.1)*3;}
+  else {const u=easeIO((t-43.5)/10);pz=lerp(36,30,u);px=lerp(Math.sin(43.5*.1)*3,0,u);py=0;}
+  camera.position.set(px,py,pz);camera.lookAt(lx,ly,lz);
+}
+
+function choreo(t){
+  // core
+  core.rotation.y=t*0.25;core.rotation.x=Math.sin(t*0.3)*0.2;
+  const pulse=1+0.08*Math.sin(t*(t<14?6:2));
+  const coreVis = t<SC.s2[0]+0.8;
+  core.visible=coreVis;
+  core.scale.setScalar(pulse*(t<5?lerp(0.2,1,ease(t/3)):1));
+  halo.material.opacity = t<14? 0.12+0.1*Math.sin(t*5):0.08;
+  coreMat.emissiveIntensity = 0.6+0.4*Math.sin(t*5);
+  // lock assemble S2
+  const l0=SC.s2[0];
+  lock.visible = t>=l0+0.1;
+  if(lock.visible){
+    const a=ease((t-l0-0.1)/1.1);
+    lock.scale.setScalar(lerp(0.2,1,a));
+    shackle.position.y=lerp(7,3.0,ease((t-l0-0.3)/0.9));
+    sl.position.y=sr.position.y=lerp(5.9,1.9,ease((t-l0-0.3)/0.9));
+    lock.rotation.y=Math.sin(t*0.4)*0.25 + (t>SC.s6[0]? (t-SC.s6[0])*0.3:0);
+    lock.rotation.x=Math.sin(t*0.3)*0.08;
+    const g2=clamp((t-l0-1.0)/1.0);
+    lockHalo.material.opacity=0.10+0.06*Math.sin(t*3)+g2*0.08;
+    bodyMat.emissiveIntensity=0.7+0.3*Math.sin(t*3);
+    // outro bigger glow
+    if(t>SC.s6[0]){const o=ease((t-SC.s6[0])/2);lock.scale.setScalar(lerp(1,1.3,o));lockHalo.material.opacity=0.18+0.06*Math.sin(t*2);lock.position.y=lerp(0,2.5,o);}
+  }
+  // shield flare during transform
+  const sh=clamp((t-(SC.s3[0]-0.5))/0.6)*(1-clamp((t-SC.s3[0]-3)/1.5));
+  shield.material.opacity=sh*0.8;shield.scale.setScalar(lerp(0.6,1.25,ease((t-(SC.s3[0]-0.5))/1.2)));
+  shield.rotation.z=t*0.3;
+  // fog/scene tint
+  const dangerAmt = t<SC.s2[0]+1.2?1:0;
+  scene.fog.color.setHex(dangerAmt?0x0a0306:0x03060a);
+  key.color.setHex(dangerAmt?0xffdede:0xffffff);
+}
+
+/* ================ UI OVERLAY ================ */
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const fmt=n=>Math.floor(n).toLocaleString('en-US');
+const SECRETS=['AWS_SECRET_ACCESS_KEY','sk-live-9f3a77c1e2d8','postgres://admin:hunter2@prod','-----BEGIN RSA PRIVATE KEY','STRIPE_SECRET=sk_live_51H','JWT_SECRET="s3cr3t-prod"','.env DATABASE_PASSWORD','GITHUB_TOKEN=ghp_9aF…','id_rsa (ssh key)','pricing margin 0.8731'];
+// fade helpers producing inline style (baked each frame -> fresh nodes raster correctly)
+const op=(l,r,out)=>clamp((l-r)/0.55)*(out!=null?1-clamp((l-out)/0.45):1);
+const tyv=(l,r,dy=26)=>(1-ease((l-r)/0.6))*dy;
+const S=(l,r,out,dy=26)=>`opacity:${op(l,r,out).toFixed(3)};transform:translateY(${tyv(l,r,dy).toFixed(1)}px)`;
+function slam(l,r,txt,style){const on=l>=r;const p=clamp((l-r)/0.13);const o=on?1:0;
+  const sh=on&&l-r<0.3?(rnd(Math.floor(l*60)+r*7)-0.5)*22*(1-(l-r)/0.3):0;
+  return `<div class="abs ctr disp" style="${style};opacity:${o};transform:scale(${(1+(1-ease(p))*0.4).toFixed(3)}) translateX(${sh.toFixed(1)}px)">${txt}</div>`;}
+const scW=(t,a,b)=>({l:(t>=a&&t<b)?t-a:-1, o:clamp((t-a)/0.4)*(1-clamp((t-(b-0.4))/0.4))});
+
+
+// ---- agent transcript (deterministic) ----
+const AG_DIRS=['src','lib','api','core','auth','billing','infra','models','services','utils','config','deploy'];
+const AG_FILES=['client.py','handler.py','routes.py','session.py','models.py','worker.py','cache.py','db.py','schema.sql','server.js','index.ts','main.go','utils.py','queue.py'];
+const AG_SECRET=[['.env','DATABASE_PASSWORD'],['config/secrets.yaml','STRIPE_SECRET'],['~/.ssh/id_rsa','SSH PRIVATE KEY'],['billing/keys.py','API_KEY  sk-live-…'],['infra/deploy.sh','AWS_SECRET_ACCESS_KEY'],['credentials.json','service-account key'],['src/pricing.py','pricing algorithm']];
+function agLine(i){
+  const sec=i>2&&rnd(i*3.7+1)<0.15;
+  const tsec=14*3600+2*60+7+Math.floor(i/5);
+  const p2=n=>String(n).padStart(2,'0');
+  const ts=p2(Math.floor(tsec/3600))+':'+p2(Math.floor(tsec/60)%60)+':'+p2(tsec%60);
+  if(sec){const e=AG_SECRET[Math.floor(rnd(i*5.1)*AG_SECRET.length)];return {sec:true,ts,path:e[0],tag:e[1]};}
+  const a=AG_DIRS[Math.floor(rnd(i*1.7)*AG_DIRS.length)],b=AG_DIRS[Math.floor(rnd(i*2.9+5)*AG_DIRS.length)],c=AG_FILES[Math.floor(rnd(i*4.1+9)*AG_FILES.length)];
+  return {sec:false,ts,path:a+'/'+b+'/'+c,tag:(1+Math.floor(rnd(i*6.3)*48))+' KB'};
+}
+const agCount=l=>Math.floor(clamp(l-0.2,0,99)*3+1.9*Math.pow(clamp(l-0.2,0,99),2));
+function agPanel(l){
+  const N=agCount(l);let rows='';
+  for(let i=Math.max(0,N-12);i<=N;i++){
+    const L=agLine(i);const age=(N-i)/12;const al=(1-age*0.65).toFixed(2);
+    rows+=L.sec
+     ?`<div style="display:flex;gap:20px;align-items:center;height:35px;padding:0 16px;background:rgba(255,59,87,.2);border-left:5px solid #ff3b57;opacity:${al}"><span style="color:#ff9aa6">${L.ts}</span><span style="color:#ff6b7d;font-weight:700">read_file</span><span style="flex:1;color:#fff;font-weight:700">${esc(L.path)}</span><span style="color:#ff3b57;font-weight:700">⚠ ${esc(L.tag)}</span></div>`
+     :`<div style="display:flex;gap:20px;align-items:center;height:35px;padding:0 16px;border-left:5px solid transparent;opacity:${al}"><span style="color:#5d6f88">${L.ts}</span><span style="color:#5fb4ff">read_file</span><span style="flex:1;color:#aebdd2">${esc(L.path)}</span><span style="color:#5d6f88">${L.tag}</span></div>`;
+  }
+  return `<div class="term" style="left:56px;top:232px;width:1320px;height:576px;background:rgba(8,12,19,.93)"><div class="tb"><span style="color:#ff3b57">●</span>&nbsp;AI AGENT · exploring the repository · tool: <span class="cyan">read_file</span><span style="margin-left:auto;color:#5d6f88">no human in the loop</span></div><div style="padding:14px 0;font:500 22px var(--mono)">${rows}</div></div>`;
+}
+function agSecrets(l){const N=agCount(l);const out=[];for(let i=0;i<=N;i++){const L=agLine(i);if(L.sec)out.push(L.tag);}return out;}
+
+const typedS=(s,l,t0,cps)=>s.slice(0,Math.floor(clamp((l-t0)*cps,0,1e9)));
+let FLASH=0;
+function termBox(x,tb,inner,st){return `<div class="term" style="${x}">${tb?`<div class="tb">${tb}</div>`:''}<pre style="${st||''}">${inner}</pre></div>`;}
+
+function sceneHTML(t){
+  FLASH=0; let H='';
+  // ---- S0 HOOK ----
+  {const {l,o}=scW(t,...SC.s0);
+   if(l>=0){let b='';
+    b+=`<div class="abs ctr kick" style="top:250px;${S(l,0.1,null,18)}">A SINGLE PROMPT</div>`;
+    b+=slam(l,0.7,'YOUR AI JUST','top:360px;font-size:150px');
+    b+=slam(l,1.5,'READ <span class="gradR">EVERYTHING</span>','top:520px;font-size:150px');
+    b+=`<div class="abs ctr cn" style="top:740px;font-size:46px;${S(l,2.6)}">It reads your entire codebase in seconds — <span class="red">including what you thought was hidden.</span></div>`;
+    [0.7,1.5].forEach(h=>{if(l>=h&&l-h<0.2)FLASH=Math.max(FLASH,0.5*(1-(l-h)/0.2));});
+    H+=`<div class="abs" style="inset:0;opacity:${o.toFixed(3)}">${b}</div>`;}}
+  // ---- S1 FLOOD ----
+  {const {l,o}=scW(t,...SC.s1);
+   if(l>=0){let b='';
+    const files=120*Math.pow(clamp(l/7),2.2)*1400, lines=files*41;
+    const gotAll=agSecrets(l);const leaked=gotAll.length;
+    b+=`<div class="abs kick" style="left:56px;top:40px">AGENT · LIVE INGEST</div>`;
+    b+=`<div class="abs" style="left:56px;top:84px;display:flex;gap:70px">
+      <div><div class="mono dim" style="font-size:18px;letter-spacing:.1em">FILES READ</div><div class="disp" style="font-size:72px">${fmt(files)}</div></div>
+      <div><div class="mono dim" style="font-size:18px;letter-spacing:.1em">LINES SCANNED</div><div class="disp" style="font-size:72px">${fmt(lines)}</div></div>
+      <div><div class="mono" style="font-size:18px;letter-spacing:.1em;color:var(--red)">SECRETS EXPOSED</div><div class="disp red" style="font-size:72px">${leaked}</div></div></div>`;
+    const got=gotAll;
+    const ctx='<span style="color:#ff8a98">→ cloud · logs · training?</span>\n\n'+got.slice(-9).reverse().map((x,i)=>`<span style="color:rgba(255,150,160,${(1-i*0.1).toFixed(2)})">⚠ ${esc(x).slice(0,30)}</span>`).join('\n');
+    b+=agPanel(l);
+    b+=termBox('right:56px;top:150px;width:430px;height:640px','◍ MODEL CONTEXT',ctx,'font-size:19px;line-height:1.55');
+    b+=`<div class="abs ctr disp" style="top:838px;font-size:82px;${S(l,5.6,null,0)}">You can't guard what you <span class="gradR">never see.</span></div>`;
+    b+=`<div class="abs ctr cn" style="top:950px;font-size:40px;${S(l,6.4)}">Humans can’t review at machine speed. Leaks are silent.</div>`;
+    H+=`<div class="abs" style="inset:0;opacity:${o.toFixed(3)}">${b}</div>`;}}
+  // ---- S2 TURN ----
+  {const {l,o}=scW(t,...SC.s2);
+   if(l>=0){let b='';const cmd='$ ailatch lock ./';
+    let pre;
+    if(l<1.0){pre='<span class="lime">'+esc(cmd.slice(0,Math.floor(clamp(l/0.03))))+'</span>▋';}
+    else{pre='<span class="lime">'+cmd+'</span>\n<span class="lime">  ✔ 3 files latched · ciphertext on disk</span>';}
+    b+=termBox('left:50%;top:360px;transform:translateX(-50%);width:760px;height:150px','<i class="dot" style="background:#ff5f56"></i><i class="dot" style="background:#ffbd2e"></i><i class="dot" style="background:#27c93f"></i>&nbsp;~/project',pre,'font-size:30px');
+    b+=`<div class="abs ctr disp" style="top:620px;font-size:116px;${S(l,1.4)}"><span class="gradC">Latch</span> it shut.</div>`;
+    b+=`<div class="abs ctr cn" style="top:770px;font-size:44px;${S(l,2.2)}">One command. Locked in place.</div>`;
+    FLASH=Math.max(FLASH,clamp(1-Math.abs(l-1.2)/0.3)*0.6);
+    H+=`<div class="abs" style="inset:0;opacity:${o.toFixed(3)}">${b}</div>`;}}
+  // ---- S3 DUAL ----
+  {const {l,o}=scW(t,...SC.s3);
+   if(l>=0){let b='';
+    const SRC='import os\nAPI_KEY = "sk-live-9f3a77c1e2d8"\nDB_URL  = "postgres://admin:hunter2@prod"\n\ndef pricing_engine(order):\n    # our secret sauce\n    return order.total * 0.8731';
+    const left='<span class="lime">$ ailatch show pricing.py</span>  <span class="dim">in memory</span>\n'+esc(SRC)+'\n\n<span class="dim"># disk: ciphertext · you: plaintext</span>';
+    const wrap=x=>x.match(/.{1,70}/gs)||[];
+    let r;
+    if(l<4.4){const head=esc(wrap((LOCK.catHead||'').replace(/\n/g,'⏎')).slice(0,3).join('\n'));
+      const ct=esc(wrap((LOCK.catCt||'').replace(/\n/g,'⏎')).slice(0,4).join('\n'));
+      const full=head+'\n<span class="dim">⋮</span>\n'+ct;const n=Math.floor(l*320);
+      r='<span class="lime">$ cat pricing.py</span>  <span class="dim">'+LOCK.size+' B</span>\n<span class="hex">'+(n>=full.length?full:full.slice(0,n).replace(/<[^>]*$/,''))+'</span>';}
+    else{r='<span class="lime">$ xxd pricing.py | head</span>  <span class="dim">'+LOCK.size+' B</span>\n';
+      (LOCK.head||[]).slice(0,3).forEach(w=>{r+=`<span class="dim">${w.off}</span>  <span class="cyan">${w.hex}</span>  <span class="cyan">${esc(w.asc)}</span>\n`;});
+      r+='<span class="dim">   ⋮   header JSON · 276 B   ⋮</span>\n';
+      const nn=Math.min((LOCK.ct||[]).length,Math.max(0,Math.floor((l-4.6)*8)));
+      (LOCK.ct||[]).slice(0,nn).forEach(w=>{r+=`<span class="dim">${w.off}</span>  <span class="amber">${w.hex}</span>  <span class="amber">${esc(w.asc)}</span>\n`;});
+      if(nn>=(LOCK.ct||[]).length)r+='<span class="red">   no "sk-live" · no "hunter2" · nothing to find</span>';}
+    b+=`<div class="abs kick" style="left:56px;top:46px">SAME FILE · TWO REALITIES</div>`;
+    b+=termBox('left:56px;top:130px;width:600px;height:540px','<span class="cyan">● YOU</span>&nbsp; ailatch show',left,'font-size:22px');
+    b+=termBox('right:56px;top:130px;width:920px;height:540px','<span class="red">● AI AGENT</span>&nbsp; reads the same path',r,'font-size:19px;line-height:1.5');
+    b+=`<div class="tag" style="right:760px;top:230px;color:var(--cyan);border-color:var(--cyan);${S(l,8.0)}">header only · algorithm</div>`;
+    b+=`<div class="tag" style="right:120px;top:600px;color:var(--amber);border-color:var(--amber);${S(l,8.6)}">359 B ciphertext · unreadable</div>`;
+    b+=`<div class="abs ctr disp" style="top:770px;font-size:96px;${S(l,6.4,null,0)}">Same file. <span class="gradC">Two realities.</span></div>`;
+    b+=`<div class="abs ctr cn" style="top:905px;font-size:42px;${S(l,7.2)}">You see plaintext. The AI sees noise.</div>`;
+    H+=`<div class="abs" style="inset:0;opacity:${o.toFixed(3)}">${b}</div>`;}}
+  // ---- S4 RUN (GUI app) ----
+  {const {l,o}=scW(t,...SC.s4);
+   if(l>=0){let b='';let h;
+    const cmd='$ ailatch run app.py';
+    if(l<0.9)h='<span class="lime">'+esc(typedS(cmd,l,0.1,34))+'</span>▋';
+    else{h='<span class="lime">'+cmd+'</span>\n<span class="dim"># decrypt in RAM → exec</span>';
+      if(l>1.3)h+='\n<span class="lime">✔ window opened</span>';
+      if(l>3.8)h+='\n\n<span class="dim">$ head -c 16 app.py | xxd</span>\n<span class="hex">9d2a 7103 0200 0000 0114 7b22 6b64 6622</span>\n<span class="amber"># still ciphertext on disk</span>';}
+    b+=`<div class="abs kick" style="left:70px;top:70px">MEMORY-ONLY EXECUTION</div>`;
+    b+=termBox('left:70px;top:150px;width:800px;height:470px','◍ runtime',h,'font-size:25px;line-height:1.6');
+    b+=`<div class="tag" style="left:70px;top:660px;color:#ffd43b;border-color:#ffd43b;${S(l,0.9)}">Python runtime · exec · import · open()</div>`;
+    // GUI window (light system style)
+    const wx=950,wy=130,ww=900,wh=600;
+    const bx=wx+40+180,by=wy+330+32;               // button centre
+    const cu=clamp((l-1.7)/1.2),ce=easeIO(cu);
+    const cx0=wx+ww-60,cy0=wy+110;
+    const curx=lerp(cx0,bx,ce),cury=lerp(cy0,by,ce);
+    const press=(l>2.95&&l<3.2)?1:0, done=l>3.05;
+    const val=done?Math.min(1,(l-3.05)/0.5):0;
+    const num=(1047.72*ease(val)).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    b+=`<div style="position:absolute;left:${wx}px;top:${wy}px;width:${ww}px;height:${wh}px;border-radius:18px;overflow:hidden;background:#f3f4f7;box-shadow:0 60px 140px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.12);${S(l,0.7)}">
+      <div style="height:52px;background:#e3e5ea;border-bottom:1px solid #cfd2d9;display:flex;align-items:center;gap:10px;padding:0 20px;font:600 19px var(--sans);color:#4a5060"><i class="dot" style="background:#ff5f56"></i><i class="dot" style="background:#ffbd2e"></i><i class="dot" style="background:#27c93f"></i><span style="margin:0 auto">Pricing Engine — app.py</span></div>
+      <div style="position:absolute;left:40px;top:88px;font:700 19px var(--sans);color:#4a5060">Order total</div>
+      <div style="position:absolute;left:40px;top:122px;width:420px;height:58px;border-radius:10px;background:#fff;border:1.5px solid #c7ccd6;font:600 26px var(--mono);color:#1b2130;display:flex;align-items:center;padding:0 18px">1,200.00</div>
+      <div style="position:absolute;left:40px;top:208px;font:700 19px var(--sans);color:#4a5060">Customer tier</div>
+      <div style="position:absolute;left:40px;top:242px;width:540px;height:52px;border-radius:10px;background:#e3e5ea;display:flex;padding:4px;gap:4px;font:700 19px var(--sans);color:#4a5060"><div style="flex:1;display:flex;align-items:center;justify-content:center">Standard</div><div style="flex:1;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:8px;color:#1b2130;box-shadow:0 2px 6px rgba(0,0,0,.18)">Pro</div><div style="flex:1;display:flex;align-items:center;justify-content:center">Enterprise</div></div>
+      <div style="position:absolute;left:40px;top:330px;width:360px;height:64px;border-radius:12px;background:linear-gradient(100deg,#b6ff5c,#53e7ff);display:flex;align-items:center;justify-content:center;font:800 24px var(--sans);color:#0a1420;transform:scale(${press?0.96:1});box-shadow:${press?'none':'0 8px 22px rgba(60,200,200,.45)'}">Calculate quote</div>
+      <div style="position:absolute;left:40px;top:430px;width:820px;height:130px;border-radius:14px;background:#0d1420;display:flex;align-items:center;gap:30px;padding:0 34px;opacity:1">
+        <div><div style="font:700 17px var(--mono);letter-spacing:.16em;color:#7d8aa0">QUOTE</div><div style="font:700 64px var(--disp);color:#b6ff5c;letter-spacing:-.02em">${done?'$'+num:'—'}</div></div>
+        <div style="margin-left:auto;text-align:right;font:600 18px var(--mono);color:#7d8aa0;line-height:1.5">computed from<br><span style="color:#ffd43b">encrypted pricing.py</span></div></div>
+    </div>`;
+    if(l>1.7)b+=`<svg style="position:absolute;left:${curx.toFixed(1)}px;top:${cury.toFixed(1)}px;width:34px;height:34px;filter:drop-shadow(0 3px 5px rgba(0,0,0,.5));opacity:${clamp((l-1.7)/0.3).toFixed(2)}" viewBox="0 0 24 24"><path d="M3 2l7 19 3-8 8-3z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+    b+=`<div class="abs ctr disp" style="top:838px;font-size:88px;${S(l,4.0,null,0)}">Disk stays sealed. <span class="gradC">Memory runs free.</span></div>`;
+    b+=`<div class="abs ctr cn" style="top:952px;font-size:40px;${S(l,4.7)}">Ciphertext on disk, always. Plaintext lives only while it runs.</div>`;
+    H+=`<div class="abs" style="inset:0;opacity:${o.toFixed(3)}">${b}</div>`;}}
+  // ---- S5 FEATURES ----
+  {const {l,o}=scW(t,...SC.s5);
+   if(l>=0){let b='';
+    const F=[['01 CIPHER','ChaCha20-Poly1305','Authenticated. Tamper → rejected.','lime','left:120px;top:210px'],
+      ['02 KDF','Argon2id','Memory-hard keys. Brute force gets costly.','cyan','left:120px;top:430px'],
+      ['03 RUNTIME','Transparent I/O','import · open() · read_text() just work.','amber','left:120px;top:650px'],
+      ['04 VIEWPORT','GUI Editor','Edit plaintext, saves back encrypted.','lime','right:120px;top:210px;text-align:right'],
+      ['05 RECOVERY','Never locked out','Encrypted backups + recovery key.','cyan','right:120px;top:430px;text-align:right'],
+      ['06 FREELOCK','JSON-RPC bridge','Controlled access for trusted tools.','amber','right:120px;top:650px;text-align:right']];
+    b+=`<div class="abs ctr kick" style="top:88px">BUILT LIKE A VAULT</div>`;
+    F.forEach((f,i)=>{b+=`<div class="feat" style="${f[4]};${S(l,0.2+i*0.22)}"><div class="n">${f[0]}</div><h3 class="${f[3]}">${f[1]}</h3><p>${f[2]}</p></div>`;});
+    b+=`<div class="abs ctr disp" style="top:905px;font-size:80px;${S(l,2.0,null,0)}">Lock the code. <span class="gradC">Keep the workflow.</span></div>`;
+    H+=`<div class="abs" style="inset:0;opacity:${o.toFixed(3)}">${b}</div>`;}}
+  // ---- S6 OUTRO ----
+  {const {l,o}=scW(t,...SC.s6);
+   if(l>=0){let b='';
+    b+=`<div class="abs ctr disp" style="top:430px;font-size:210px;${S(l,0.4,null,18)}"><span class="gradC">AILatch</span></div>`;
+    b+=`<div class="abs ctr disp" style="top:688px;font-size:74px;${S(l,1.3)}">Latch it. Run it. <span class="lime">Ship it.</span></div>`;
+    b+=`<div class="abs ctr cn" style="top:802px;font-size:40px;${S(l,2.0)}">Lock your code. Keep it running.</div>`;
+    b+=`<div class="abs ctr" style="top:898px;font:600 34px var(--mono);${S(l,2.8)}"><span style="padding:16px 34px;border:1px solid rgba(120,160,120,.4);border-radius:14px;background:rgba(11,17,26,.7);color:var(--lime)">$ pip install ailatch</span><span class="dim" style="margin-left:26px;font-size:28px">github.com/lo2589/AILATCH</span></div>`;
+    b+=`<div class="abs ctr mono" style="top:988px;font-size:26px;${S(l,3.6)}"><span style="padding:7px 18px;border:1px solid #ffd43b;border-radius:999px;color:#ffd43b;font-weight:700">Python 3.11+</span><span class="dim" style="margin-left:18px">Runtime support today: encrypted .py · imports · open()</span></div>`;
+    H+=`<div class="abs" style="inset:0;opacity:${o.toFixed(3)}">${b}</div>`;}}
+  // ---- brand (baked) ----
+  const bo=(t>1.2&&t<SC.s6[0]+0.3)?0.9:0;
+  if(bo>0)H+=`<div class="abs" style="right:52px;top:34px;display:flex;align-items:center;gap:13px;opacity:${bo}"><svg width="44" height="44" viewBox="0 0 120 120" fill="none"><defs><linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b6ff5c"/><stop offset="1" stop-color="#53e7ff"/></linearGradient></defs><path d="M38 54V38a22 22 0 0 1 44 0v16" stroke="url(#bg2)" stroke-width="10" stroke-linecap="round"/><rect x="24" y="52" width="72" height="54" rx="14" fill="url(#bg2)"/><circle cx="60" cy="76" r="7" fill="#03040a"/><rect x="57" y="78" width="6" height="14" rx="3" fill="#03040a"/></svg><div><div style="font:700 25px var(--disp);color:#eef3fb;line-height:1">AILatch</div><div style="font:600 17px var(--mono);color:var(--lime);line-height:1.3">@lo2589</div></div></div>`;
+  // ---- sim note ----
+  const simOn=((t>=SC.s1[0]&&t<SC.s2[0])||(t>=SC.s3[0]&&t<SC.s3[1]));
+  if(simOn)H+=`<div class="abs" style="left:54px;bottom:30px;font:600 15px var(--mono);color:rgba(140,155,180,.5)">Illustrative simulation</div>`;
+  // ---- flash ----
+  if(FLASH>0.01)H+=`<div class="abs" style="inset:0;background:#dffcff;opacity:${FLASH.toFixed(3)};mix-blend-mode:screen"></div>`;
+  return H;
+}
+window.sceneHTML=sceneHTML;
+let _ovPrev=null;
+function overlay(t){
+  const host=$('ui');
+  const nv=document.createElement('div');nv.className='ovframe';
+  nv.style.cssText='position:absolute;inset:0;z-index:5';
+  nv.innerHTML=sceneHTML(t);
+  host.appendChild(nv);
+  if(_ovPrev)_ovPrev.remove();
+  _ovPrev=nv;
+}
+
+/* ================ MAIN ================ */
+let built=false;
+function renderGL(t){t=clamp(t,0,DUR-0.001);updateRiver(t);choreo(t);cam(t);composer.render();ctx2.clearRect(0,0,W,H);ctx2.drawImage(glCanvas,0,0,W,H);}
+function render(t){t=clamp(t,0,DUR-0.001);renderGL(t);overlay(t);
+  const hb=$('bar');if(hb&&hb.firstElementChild)hb.firstElementChild.style.width=(t/DUR*100)+'%';}
+window.__gl=t=>renderGL(t);
+window.__domFresh=t=>{document.querySelectorAll('.ovframe').forEach(e=>e.remove());const d=document.createElement('div');d.className='ovframe';d.style.cssText='position:absolute;inset:0;z-index:5';d.innerHTML=sceneHTML(t);$('ui').appendChild(d);};
+window.__dom=t=>overlay(t);
+window.__seek=x=>{render(x);};
+window.__ready=true;
+
+// playback
+let t=0,playing=false,last=0;
+function loop(ts){if(playing){t+=(ts-last)/1000;if(t>=DUR)t=0;}last=ts;render(t);requestAnimationFrame(loop);}
+function setPlay(p){playing=p;$('pp').textContent=p?'⏸':'▶';document.body.classList.toggle('paused',!p);}
+$('start').onclick=()=>{$('start').style.display='none';setPlay(true);};
+$('pp').onclick=()=>setPlay(!playing);$('rs').onclick=()=>{t=0;};
+$('fs').onclick=()=>{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();};
+$('bar').onclick=e=>{const r=$('bar').getBoundingClientRect();t=(e.clientX-r.left)/r.width*DUR;};
+addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();$('start').style.display='none';setPlay(!playing);}if(e.code==='ArrowRight')t=Math.min(DUR-.1,t+2);if(e.code==='ArrowLeft')t=Math.max(0,t-2);});
+function fit(){const s=Math.min(innerWidth/W,innerHeight/H);$('stage').style.transform=`scale(${s})`;}
+addEventListener('resize',fit);fit();
+const q=new URLSearchParams(location.search);
+if(q.has('t')){render(+q.get('t'));$('start').style.display='none';}
+else if(q.has('autoplay')){$('start').style.display='none';setPlay(true);}
+else render(0);
+requestAnimationFrame(ts=>{last=ts;loop(ts);});
+</script>
+</body>
+</html>
