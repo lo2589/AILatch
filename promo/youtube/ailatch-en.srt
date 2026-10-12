@@ -1,0 +1,31 @@
+1
+00:00:01,500 --> 00:00:04,600
+Your AI just read everything.
+
+2
+00:00:04,600 --> 00:00:07,200
+It reads your entire codebase in minutes, including what you thought was hidden.
+
+3
+00:00:07,500 --> 00:00:15,000
+An AI agent reads file after file. Humans can't review at machine speed, so leaks are silent.
+
+4
+00:00:15,500 --> 00:00:20,000
+One command locks your code in place: ailatch lock.
+
+5
+00:00:20,500 --> 00:00:29,000
+Same file, two realities. You see plaintext. The AI sees only noise.
+
+6
+00:00:29,500 --> 00:00:37,000
+Same app, two ways to run it. python app.py and ailatch run app.py give identical results, but an LLM reading the locked file only sees ciphertext.
+
+7
+00:00:37,500 --> 00:00:45,000
+Built like a vault: ChaCha20-Poly1305 encryption, Argon2id keys, transparent imports and file I/O, a GUI editor, recovery keys.
+
+8
+00:00:45,500 --> 00:00:55,500
+AILatch. Latch it. Run it. Ship it. Information locked, code visible and runnable. pip install ailatch. Python 3.11 and up.
