@@ -6,10 +6,9 @@
 
 ## Demo
 
-<https://github.com/lo2589/AILATCH/raw/main/ailatch.mp4>
+![AILatch demo: the plaintext app and the locked app run with identical results, while an LLM reading the locked file sees only ciphertext](assets/ailatch-demo.gif)
 
-*(Click the link above if your viewer doesn't auto-play the video. The file
-[`ailatch.mp4`](./ailatch.mp4) lives at the repository root.)*
+*Same app, two ways to run it. `python app.py` and `ailatch run app.py` give identical results, but an LLM that reads the locked file only sees ciphertext.*
 
 **Latch private files away from AI while keeping encrypted Python code runnable.**
 
