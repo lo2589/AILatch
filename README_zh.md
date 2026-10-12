@@ -3,11 +3,11 @@
 > **AILatch 就是原来的 AiLock。** 老用户仍可继续使用 `ailock` 命令和
 > `python -m aloc`；这两个旧入口会继续兼容。新文档统一使用 `ailatch`。
 
-## 演示视频
+## 演示
 
-<https://github.com/lo2589/AILATCH/raw/main/ailatch.mp4>
+![AILatch 演示：明文程序和加密程序运行结果完全一致，LLM 读取加密文件只能看到乱码](assets/ailatch-demo.gif)
 
-*（链接播放仓库根目录下的 [`ailatch.mp4`](./ailatch.mp4)。）*
+*同一个程序，两种运行方式。`python app.py` 和 `ailatch run app.py` 结果完全一致，但 LLM 读加密后的文件只能看到乱码。*
 
 **AILatch 给源代码加密，加密后的代码借助 AILatch 依然能正常运行。**
 
