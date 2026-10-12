@@ -1,0 +1,16 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="cover2.css"><style>body{width:1080px;height:1440px}</style></head><body><div class="stage"></div>
+<div class="abs" style="left:70px;top:64px;display:flex;align-items:center;gap:16px"><div style="width:48px;height:48px"><svg viewBox="0 0 48 48" width="100%" height="100%" fill="none" stroke="#f3f6fb" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="21" width="30" height="21" rx="5"/><path d="M16 21v-6a8 8 0 0 1 16 0v6"/><circle cx="24" cy="31" r="2.2" fill="#f3f6fb" stroke="none"/></svg></div><div style="font:700 36px var(--disp);color:#f3f6fb;letter-spacing:-.02em">AILatch</div><div style="font:600 24px var(--mono);color:#7dffb0;margin-left:6px">@lo2589</div></div>
+<div class="abs cn" style="left:70px;top:178px;font-size:158px">AI 能读到</div>
+<div class="abs cn" style="left:70px;top:348px;font-size:158px">你的 <span class="r" style="font-family:var(--disp);letter-spacing:-.04em">.env</span></div>
+<div class="card" style="left:70px;top:590px;width:940px;height:290px"><div class="top" style="background:var(--red)"></div><div class="bar" style="height:70px"><b>.env</b><span class="tag" style="color:var(--red);background:rgba(255,77,99,.14)">上锁前 · 明文</span></div>
+<div style="padding-top:22px"><div class="code" style="font-size:30px;line-height:1.75"><span class="k">DATABASE_URL</span>=postgres://admin:<span class="sec">hunter2</span>@prod
+<span class="k">API_KEY</span>=<span class="sec">sk-live-9f3a77c1e2d8</span>
+<span class="k">DEBUG</span>=false</div></div></div>
+<div class="arrow" style="left:70px;top:900px;width:940px;flex-direction:row;justify-content:center;gap:18px"><svg width="34" height="64" viewBox="0 0 30 64" fill="none" stroke="#8794a8" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2v58M3 46l12 14 12-14"/></svg><span style="font-size:26px">ailatch lock .env</span></div>
+<div class="card" style="left:70px;top:980px;width:940px;height:290px"><div class="top" style="background:var(--green)"></div><div class="bar" style="height:70px"><b>.env</b><span class="tag" style="color:var(--green);background:rgba(125,255,176,.12)">上锁后 · 密文</span></div>
+<div style="padding-top:22px"><div class="code" style="font-size:30px;line-height:1.75"><span class="hx">9d 2a 71 03 02 00 00 00 01 14 7b 22 6b 64 66 22</span>
+<span class="hx">3a 22 61 72 67 6f 6e 32 69 64 22 2c 22 61 65 61</span>
+<span class="hx">64 22 3a 22 63 68 61 63 68 61 32 30 70 6f 6c 79</span></div></div></div>
+<div class="abs cn" style="left:70px;top:1292px;font-size:52px;font-weight:700;color:#aeb9ca">AI 只看到乱码,代码照常运行</div>
+<div class="abs" style="left:70px;top:1368px;display:flex;gap:16px"><span class="py">目前支持 Python 3.11+</span><span class="pip">$ pip install ailatch</span></div>
+</body></html>
